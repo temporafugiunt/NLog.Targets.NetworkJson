@@ -91,6 +91,38 @@ namespace Gelf4NLog.UnitTest
             }
 
             [Test]
+            public void ShouldHandle10NestedExceptionCorrectly()
+            {
+                var nestedException = new Exception("Inner Exception Detail - 10");
+                for (int i = 9; i > 0; i--)
+                {
+                    var nextException = new Exception("Inner Exception Detail - " + i.ToString(), nestedException);
+                    nestedException = nextException;
+                }
+                var outerException = new Exception("Outer Exception Detail", nestedException);
+
+                var logEvent = new LogEventInfo
+                {
+                    Message = "Test Message",
+                    Exception = outerException
+                };
+
+                var jsonObject = new GelfConverter().GetGelfJson(logEvent, "TestFacility");
+
+                Assert.IsNotNull(jsonObject);
+                Assert.AreEqual("Test Message", jsonObject.Value<string>("short_message"));
+                Assert.AreEqual("Test Message", jsonObject.Value<string>("full_message"));
+                Assert.AreEqual(3, jsonObject.Value<int>("level"));
+                Assert.AreEqual("TestFacility", jsonObject.Value<string>("facility"));
+                Assert.AreEqual(null, jsonObject.Value<string>("_ExceptionSource"));
+                const string expectedExceptionDetail =
+                    "Outer Exception Detail - Inner Exception Detail - 1 - Inner Exception Detail - 2 - Inner Exception Detail - 3 - Inner Exception Detail - 4 - Inner Exception Detail - 5 - Inner Exception Detail - 6 - Inner Exception Detail - 7 - Inner Exception Detail - 8 - Inner Exception Detail - 9 - Inner Exception Detail - 10";
+                Assert.AreEqual(expectedExceptionDetail, jsonObject.Value<string>("_ExceptionMessage"));
+                Assert.AreEqual(null, jsonObject.Value<string>("_StackTrace"));
+                Assert.AreEqual(null, jsonObject.Value<string>("_LoggerName"));
+            }
+
+            [Test]
             public void ShouldHandleLongMessageCorrectly()
             {
                 var logEvent = new LogEventInfo

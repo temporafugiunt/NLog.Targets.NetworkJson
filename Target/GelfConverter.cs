@@ -22,9 +22,13 @@ namespace Gelf4NLog.Target
             //If we are dealing with an exception, pass exception properties to LogEventInfo properties
             if (logEventInfo.Exception != null)
             {
+                var exceptionDetail = string.Empty;
+                string stackDetail = null; 
+
+                this.GetExceptionMessages(logEventInfo.Exception, out exceptionDetail, out stackDetail);
                 logEventInfo.Properties.Add("ExceptionSource", logEventInfo.Exception.Source);
-                logEventInfo.Properties.Add("ExceptionMessage", GetExceptionMessages(logEventInfo.Exception));
-                logEventInfo.Properties.Add("StackTrace", logEventInfo.Exception.StackTrace);
+                logEventInfo.Properties.Add("ExceptionMessage", exceptionDetail);
+                logEventInfo.Properties.Add("StackTrace", stackDetail);
             }
 
             //Figure out the short message
@@ -125,19 +129,27 @@ namespace Gelf4NLog.Target
         /// </summary>
         /// <param name="ex"></param>
         /// <returns></returns>
-        private string GetExceptionMessages(Exception ex)
+        private void GetExceptionMessages(Exception ex, out string exceptionDetail,out string stackDetail)
         {
-            var sb = new StringBuilder();
+            var exceptionSb = new StringBuilder();
+            var stackSb = new StringBuilder();
             var nestedException = ex;
+            stackDetail = null;
+
             int counter = 0;
             do
             {
-                sb.Append(nestedException.Message + " - ");
+                exceptionSb.Append(nestedException.Message + " - ");
+                if (nestedException.StackTrace != null)
+                    stackSb.Append(nestedException.StackTrace + "--- Inner exception stack trace ---");
                 nestedException = nestedException.InnerException;
                 counter++;
             }
             while (nestedException != null && counter < 11);
-            return sb.ToString().Substring(0, sb.Length - 3);
+
+            exceptionDetail = exceptionSb.ToString().Substring(0, exceptionSb.Length - 3);
+            if (stackSb.Length > 0)
+                stackDetail = stackSb.ToString().Substring(0, stackSb.Length - 35);
         }
     }
 }
