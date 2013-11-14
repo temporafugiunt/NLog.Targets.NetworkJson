@@ -69,6 +69,28 @@ namespace Gelf4NLog.UnitTest
             }
 
             [Test]
+            public void ShouldHandleNestedExceptionCorrectly()
+            {
+                var logEvent = new LogEventInfo
+                {
+                    Message = "Test Message",
+                    Exception = new Exception("Outer Exception Detail", new Exception("Inner Exception Detail"))
+                };
+
+                var jsonObject = new GelfConverter().GetGelfJson(logEvent, "TestFacility");
+
+                Assert.IsNotNull(jsonObject);
+                Assert.AreEqual("Test Message", jsonObject.Value<string>("short_message"));
+                Assert.AreEqual("Test Message", jsonObject.Value<string>("full_message"));
+                Assert.AreEqual(3, jsonObject.Value<int>("level"));
+                Assert.AreEqual("TestFacility", jsonObject.Value<string>("facility"));
+                Assert.AreEqual(null, jsonObject.Value<string>("_ExceptionSource"));
+                Assert.AreEqual("Outer Exception Detail - Inner Exception Detail", jsonObject.Value<string>("_ExceptionMessage"));
+                Assert.AreEqual(null, jsonObject.Value<string>("_StackTrace"));
+                Assert.AreEqual(null, jsonObject.Value<string>("_LoggerName"));
+            }
+
+            [Test]
             public void ShouldHandleLongMessageCorrectly()
             {
                 var logEvent = new LogEventInfo

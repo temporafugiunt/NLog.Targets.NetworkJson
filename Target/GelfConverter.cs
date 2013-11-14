@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Net;
 using NLog;
 using Newtonsoft.Json.Linq;
+using System.Text;
 
 namespace Gelf4NLog.Target
 {
@@ -22,7 +23,7 @@ namespace Gelf4NLog.Target
             if (logEventInfo.Exception != null)
             {
                 logEventInfo.Properties.Add("ExceptionSource", logEventInfo.Exception.Source);
-                logEventInfo.Properties.Add("ExceptionMessage", logEventInfo.Exception.Message);
+                logEventInfo.Properties.Add("ExceptionMessage", GetExceptionMessages(logEventInfo.Exception));
                 logEventInfo.Properties.Add("StackTrace", logEventInfo.Exception.StackTrace);
             }
 
@@ -117,6 +118,26 @@ namespace Gelf4NLog.Target
             }
 
             return 3; //LogLevel.Error
+        }
+
+        /// <summary>
+        /// Get the message details from all nested exceptions, up to 10 in depth.
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <returns></returns>
+        private string GetExceptionMessages(Exception ex)
+        {
+            var sb = new StringBuilder();
+            var nestedException = ex;
+            int counter = 0;
+            do
+            {
+                sb.Append(nestedException.Message + " - ");
+                nestedException = nestedException.InnerException;
+                counter++;
+            }
+            while (nestedException != null && counter < 11);
+            return sb.ToString().Substring(0, sb.Length - 3);
         }
     }
 }
