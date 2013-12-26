@@ -22,10 +22,11 @@ namespace Gelf4NLog.Target
             //If we are dealing with an exception, pass exception properties to LogEventInfo properties
             if (logEventInfo.Exception != null)
             {
-                var exceptionDetail = string.Empty;
-                string stackDetail = null; 
+                string exceptionDetail;
+                string stackDetail; 
 
-                this.GetExceptionMessages(logEventInfo.Exception, out exceptionDetail, out stackDetail);
+                GetExceptionMessages(logEventInfo.Exception, out exceptionDetail, out stackDetail);
+
                 logEventInfo.Properties.Add("ExceptionSource", logEventInfo.Exception.Source);
                 logEventInfo.Properties.Add("ExceptionMessage", exceptionDetail);
                 logEventInfo.Properties.Add("StackTrace", stackDetail);
@@ -127,9 +128,10 @@ namespace Gelf4NLog.Target
         /// <summary>
         /// Get the message details from all nested exceptions, up to 10 in depth.
         /// </summary>
-        /// <param name="ex"></param>
-        /// <returns></returns>
-        private void GetExceptionMessages(Exception ex, out string exceptionDetail,out string stackDetail)
+        /// <param name="ex">Exception to get details for</param>
+        /// <param name="exceptionDetail">Exception message</param>
+        /// <param name="stackDetail">Stacktrace with inner exceptions</param>
+        private void GetExceptionMessages(Exception ex, out string exceptionDetail, out string stackDetail)
         {
             var exceptionSb = new StringBuilder();
             var stackSb = new StringBuilder();

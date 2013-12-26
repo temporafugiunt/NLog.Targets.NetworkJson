@@ -60,3 +60,7 @@ _ReSharper*/
 
 # visual studio database projects
 *.dbmdl
+
+Deploy
+packages
+*.DotSettings
