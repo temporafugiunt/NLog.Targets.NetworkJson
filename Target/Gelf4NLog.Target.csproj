@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="GelfConverter.cs" />
     <Compile Include="GelfMessage.cs" />
+    <Compile Include="GelfParameterInfo.cs" />
     <Compile Include="IConverter.cs" />
     <Compile Include="ITransport.cs" />
     <Compile Include="ITransportClient.cs" />
