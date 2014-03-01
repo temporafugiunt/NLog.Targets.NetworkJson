@@ -1,4 +1,4 @@
-# Nlog.Targets.Gelf
+# NLog.Targets.Gelf
 Gelf4NLog is an [NLog] target implementation to push log messages to [GrayLog2]. It implements the [Gelf] specification and communicates with GrayLog server via UDP.
 
 ## History
@@ -9,7 +9,7 @@ Solution is comprised of 3 projects: *Target* is the actual NLog target implemen
 ## Usage
 Use Nuget:
 ```
-PM> Install-Package Nlog.Targets.Gelf
+PM> Install-Package NLog.Targets.Gelf
 ```
 ### Configuration
 Here is a sample nlog configuration snippet:
