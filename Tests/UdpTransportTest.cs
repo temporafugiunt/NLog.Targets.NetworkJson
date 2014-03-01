@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Net;
-using Gelf4NLog.Target;
-using Gelf4NLog.UnitTest.Resources;
 using Moq;
 using NLog;
 using NUnit.Framework;
 using Newtonsoft.Json.Linq;
+using NLog.Targets.Gelf;
+using NLog.Targets.Gelf.Tests.Resources;
 
-namespace Gelf4NLog.UnitTest
+namespace NLog.Targets.Gelf.UnitTest
 {
     public class UdpTransportTest
     {
@@ -20,10 +20,12 @@ namespace Gelf4NLog.UnitTest
                 var transportClient = new Mock<ITransportClient>();
                 var transport = new UdpTransport(transportClient.Object);
                 var converter = new Mock<IConverter>();
+                var dnslookup = new Mock<DnsBase>();
                 converter.Setup(c => c.GetGelfJson(It.IsAny<LogEventInfo>(), It.IsAny<string>())).Returns(new JObject());
 
-                var target = new NLogTarget(transport, converter.Object) { HostIp = "127.0.0.1" };
+                var target = new GelfTarget(transport, converter.Object, dnslookup.Object) { HostIp = "127.0.0.1" };
                 var logEventInfo = new LogEventInfo { Message = "Test Message" };
+                dnslookup.Setup(x => x.GetHostAddresses(It.IsAny<string>())).Returns(new[] { IPAddress.Parse("127.0.0.1") });
 
                 target.WriteLogEventInfo(logEventInfo);
 
@@ -43,10 +45,11 @@ namespace Gelf4NLog.UnitTest
                 converter.Setup(c => c.GetGelfJson(It.IsAny<LogEventInfo>(), It.IsAny<string>())).Returns(jsonObject).Verifiable();
                 var transportClient = new Mock<ITransportClient>();
                 transportClient.Setup(t => t.Send(It.IsAny<byte[]>(), It.IsAny<Int32>(), It.IsAny<IPEndPoint>())).Verifiable();
-
+               
                 var transport = new UdpTransport(transportClient.Object);
-
-                var target = new NLogTarget(transport, converter.Object) { HostIp = "127.0.0.1" };
+                var dnslookup = new Mock<DnsBase>();
+                dnslookup.Setup(x => x.GetHostAddresses(It.IsAny<string>())).Returns(new []{IPAddress.Parse("127.0.0.1")});
+                var target = new GelfTarget(transport, converter.Object, dnslookup.Object) { HostIp = "127.0.0.1" };
                 target.WriteLogEventInfo(new LogEventInfo());
 
                 transportClient.Verify(t => t.Send(It.IsAny<byte[]>(), It.IsAny<Int32>(), It.IsAny<IPEndPoint>()), Times.Exactly(2));

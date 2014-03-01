@@ -8,7 +8,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Gelf4NLog.Target
+namespace NLog.Targets.Gelf
 {
     public class UdpTransport : ITransport
     {
@@ -35,6 +35,18 @@ namespace Gelf4NLog.Target
         {
             var ipAddress = IPAddress.Parse(serverIpAddress);
             var ipEndPoint = new IPEndPoint(ipAddress, serverPort);
+
+           Send(ipEndPoint, message);
+        }
+
+        /// <summary>
+        /// Sends a UDP datagram to GrayLog2 server
+        /// </summary>
+        /// <param name="target">IP Endpoint of the  of the target GrayLog2 server</param>
+        /// <param name="message">Message (in JSON) to log</param>
+        public void Send(IPEndPoint target, string message)
+        {
+            var ipEndPoint = target;
 
             var compressedMessage = CompressMessage(message);
 

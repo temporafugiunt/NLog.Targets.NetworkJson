@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Net;
-using Gelf4NLog.Target;
 using NLog;
 using NUnit.Framework;
 
-namespace Gelf4NLog.UnitTest
+namespace NLog.Targets.Gelf.UnitTest
 {
     public class GelfConverterTest
     {

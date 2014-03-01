@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Gelf4NLog.Target
+namespace NLog.Targets.Gelf
 {
     public interface ITransportClient
     {

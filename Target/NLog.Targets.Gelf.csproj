@@ -8,8 +8,8 @@
     <ProjectGuid>{8A614770-AEC9-42AD-87BA-CCD53F880A55}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Gelf4NLog.Target</RootNamespace>
-    <AssemblyName>Gelf4NLog.Target</AssemblyName>
+    <RootNamespace>NLog.Targets.Gelf</RootNamespace>
+    <AssemblyName>NLog.Targets.Gelf</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -53,6 +53,7 @@
     <Compile Include="GelfMessage.cs" />
     <Compile Include="GelfParameterInfo.cs" />
     <Compile Include="IConverter.cs" />
+    <Compile Include="IDnsResolver.cs" />
     <Compile Include="ITransport.cs" />
     <Compile Include="ITransportClient.cs" />
     <Compile Include="NLogTarget.cs" />

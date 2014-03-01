@@ -4,12 +4,16 @@ using NLog.Targets;
 using Newtonsoft.Json;
 using NLog.Config;
 using System.Collections.Generic;
+using System;
+using System.Linq;
+using System.Net;
 
-namespace Gelf4NLog.Target
+namespace NLog.Targets.Gelf
 {
-    [Target("GrayLog")]
-    public class NLogTarget : TargetWithLayout
+    [Target("Gelf")]
+    public class GelfTarget : TargetWithLayout
     {
+        private Lazy<IPEndPoint> _lazyIpEndoint;
         [Required]
         public string HostIp { get; set; }
 
@@ -23,16 +27,26 @@ namespace Gelf4NLog.Target
 
         public IConverter Converter { get; private set; }
         public ITransport Transport { get; private set; }
+        public DnsBase Dns { get; private set; }
 
-        public NLogTarget() : this(new UdpTransport(new UdpTransportClient()), new GelfConverter())
+        public GelfTarget() : this(new UdpTransport(new UdpTransportClient()), new GelfConverter(), new DnsWrapper())
         {
         }
 
-        public NLogTarget(ITransport transport, IConverter converter)
+        public GelfTarget(ITransport transport, IConverter converter, DnsBase dns)
         {
+            Dns = dns;
             Transport = transport;
             Converter = converter;
             this.Parameters = new List<GelfParameterInfo>();
+            _lazyIpEndoint = new Lazy<IPEndPoint>(() =>
+            {
+                var addresses = Dns.GetHostAddresses(HostIp);
+                var ip = addresses
+                    .Where(x=>x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                    .FirstOrDefault();
+                return new IPEndPoint(ip, HostPort);
+            });
         }
 
         public void WriteLogEventInfo(LogEventInfo logEvent)
@@ -54,7 +68,7 @@ namespace Gelf4NLog.Target
 
             var jsonObject = Converter.GetGelfJson(logEvent, Facility);
             if (jsonObject == null) return;
-            Transport.Send(HostIp, HostPort, jsonObject.ToString(Formatting.None, null));
+            Transport.Send(_lazyIpEndoint.Value, jsonObject.ToString(Formatting.None, null));
         }
     }
 }

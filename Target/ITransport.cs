@@ -1,7 +1,8 @@
-﻿namespace Gelf4NLog.Target
+﻿using System.Net;
+namespace NLog.Targets.Gelf
 {
     public interface ITransport
     {
-        void Send(string serverIpAddress, int serverPort, string message);
+        void Send(IPEndPoint target, string message);
     }
 }

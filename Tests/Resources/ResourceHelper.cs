@@ -2,7 +2,7 @@
 using System.Reflection;
 using NUnit.Framework;
 
-namespace Gelf4NLog.UnitTest.Resources
+namespace NLog.Targets.Gelf.Tests.Resources
 {
     internal class ResourceHelper
     {

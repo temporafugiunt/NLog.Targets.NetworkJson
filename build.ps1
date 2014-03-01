@@ -1,15 +1,15 @@
 ﻿properties {
-    $ProductName = "Gelf4NLog.Target"
+    $ProductName = "NLog.Targets.Gelf"
     $BaseDir = Resolve-Path "."
-    $SolutionFile = "$BaseDir\Gelf4NLog.sln"
+    $SolutionFile = "$BaseDir\NLog.Targets.Gelf.sln"
     $OutputDir = "$BaseDir\Deploy\Package\"
     # Gets the number of commits since the last tag. 
     $Version = "1.0.0.4"
     $BuildConfiguration = "Release"
     
-    $NuGetPackageName = "Gelf4NLog.Target"
+    $NuGetPackageName = "NLog.Targets.Gelf"
     $NuGetPackDir = "$OutputDir" + "Pack"
-    $NuSpecFileName = "Gelf4NLog.Target.nuspec"
+    $NuSpecFileName = "NLog.Targets.Gelf.nuspec"
     $NuGetPackagePath = "$OutputDir" + $NuGetPackageName + "." + $Version + ".nupkg"
     
     $ArchiveDir = "$OutputDir" + "Archive"
@@ -40,7 +40,7 @@ task Pack -depends Build {
     cp "$NuSpecFileName" "$NuGetPackDir"
 
     mkdir "$NuGetPackDir\lib\net40"
-    cp "$OutputDir\Gelf4NLog.Target.dll" "$NuGetPackDir\lib\net40"
+    cp "$OutputDir\NLog.Targets.Gelf.dll" "$NuGetPackDir\lib\net40"
 
     $Spec = [xml](get-content "$NuGetPackDir\$NuSpecFileName")
     $Spec.package.metadata.version = ([string]$Spec.package.metadata.version).Replace("{Version}",$Version)

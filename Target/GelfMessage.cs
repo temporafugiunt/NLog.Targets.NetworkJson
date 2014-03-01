@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Gelf4NLog.Target
+namespace NLog.Targets.Gelf
 {
     [JsonObject(MemberSerialization.OptIn)]
     public class GelfMessage

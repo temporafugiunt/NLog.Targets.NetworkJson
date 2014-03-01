@@ -67,9 +67,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Target\Gelf4NLog.Target.csproj">
+    <ProjectReference Include="..\Target\NLog.Targets.Gelf.csproj">
       <Project>{8A614770-AEC9-42AD-87BA-CCD53F880A55}</Project>
-      <Name>Gelf4NLog.Target</Name>
+      <Name>NLog.Targets.Gelf</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

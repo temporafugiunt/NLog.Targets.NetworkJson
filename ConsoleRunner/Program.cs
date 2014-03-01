@@ -4,7 +4,7 @@ using System.Threading;
 using LumenWorks.Framework.IO.Csv;
 using NLog;
 
-namespace Gelf4NLog.ConsoleRunner
+namespace NLog.Targets.Gelf.ConsoleRunner
 {
     class Program
     {

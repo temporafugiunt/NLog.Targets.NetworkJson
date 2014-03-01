@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 
-namespace Gelf4NLog.Target
+namespace NLog.Targets.Gelf
 {
     public class UdpTransportClient : ITransportClient
     {

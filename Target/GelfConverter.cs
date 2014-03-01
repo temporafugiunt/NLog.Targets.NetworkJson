@@ -6,7 +6,7 @@ using NLog;
 using Newtonsoft.Json.Linq;
 using System.Text;
 
-namespace Gelf4NLog.Target
+namespace NLog.Targets.Gelf
 {
     public class GelfConverter : IConverter
     {

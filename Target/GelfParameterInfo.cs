@@ -6,7 +6,7 @@ using NLog.Config;
 using NLog.Layouts;
 
 
-namespace Gelf4NLog.Target
+namespace NLog.Targets.Gelf
 {
     [NLogConfigurationItem]
     public class GelfParameterInfo

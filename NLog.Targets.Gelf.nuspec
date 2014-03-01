@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-    <id>Gelf4NLog.Target</id>
+    <id>NLog.Targets.Gelf</id>
     <version>{Version}</version>
-    <title>Gelf4NLog.Target</title>
-    <authors>Ozan Seymen</authors>
-    <owners>Ozan Seymen</owners>
-    <licenseUrl>https://github.com/seymen/Gelf4NLog/blob/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/seymen/Gelf4NLog</projectUrl>
+    <title>NLog.Targets.Gelf</title>
+    <authors>2020 Legal</authors>
+    <owners>2020 Legal</owners>
+    <licenseUrl>https://github.com/2020legal/Gelf4NLog/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/2020legal/Gelf4NLog</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>NLog Target for GrayLog2</description>
     <releaseNotes />
-    <copyright>Copyright 2012</copyright>
+    <copyright>Copyright 2014</copyright>
     <language />
     <dependencies>
       <dependency id="Newtonsoft.Json" version="5.0.0" />

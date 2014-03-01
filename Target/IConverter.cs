@@ -1,7 +1,7 @@
 ﻿using NLog;
 using Newtonsoft.Json.Linq;
 
-namespace Gelf4NLog.Target
+namespace NLog.Targets.Gelf
 {
     public interface IConverter
     {
