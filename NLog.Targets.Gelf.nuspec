@@ -6,8 +6,8 @@
     <title>NLog.Targets.Gelf</title>
     <authors>2020 Legal</authors>
     <owners>2020 Legal</owners>
-    <licenseUrl>https://github.com/2020legal/Gelf4NLog/blob/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/2020legal/Gelf4NLog</projectUrl>
+    <licenseUrl>https://github.com/2020Legal/NLog.Targets.Gelf/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/2020Legal/NLog.Targets.Gelf</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>NLog Target for GrayLog2</description>
     <releaseNotes />
