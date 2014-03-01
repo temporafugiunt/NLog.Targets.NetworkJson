@@ -15,7 +15,7 @@ namespace NLog.Targets.Gelf
     {
         private Lazy<IPEndPoint> _lazyIpEndoint;
         [Required]
-        public string HostIp { get; set; }
+        public string Host { get; set; }
 
         [Required]
         public int HostPort { get; set; }
@@ -41,7 +41,7 @@ namespace NLog.Targets.Gelf
             this.Parameters = new List<GelfParameterInfo>();
             _lazyIpEndoint = new Lazy<IPEndPoint>(() =>
             {
-                var addresses = Dns.GetHostAddresses(HostIp);
+                var addresses = Dns.GetHostAddresses(Host);
                 var ip = addresses
                     .Where(x=>x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                     .FirstOrDefault();

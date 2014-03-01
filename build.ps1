@@ -4,7 +4,7 @@
     $SolutionFile = "$BaseDir\NLog.Targets.Gelf.sln"
     $OutputDir = "$BaseDir\Deploy\Package\"
     # Gets the number of commits since the last tag. 
-    $Version = "1.0.0.4"
+    $Version = "0.0.1.0"
     $BuildConfiguration = "Release"
     
     $NuGetPackageName = "NLog.Targets.Gelf"
