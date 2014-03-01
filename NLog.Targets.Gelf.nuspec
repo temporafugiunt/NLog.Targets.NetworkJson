@@ -10,6 +10,7 @@
     <projectUrl>https://github.com/2020Legal/NLog.Targets.Gelf</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>NLog Target for GrayLog2</description>
+    <tags>gelf,graylog2,nlog</tags>
     <releaseNotes />
     <copyright>Copyright 2014</copyright>
     <language />
