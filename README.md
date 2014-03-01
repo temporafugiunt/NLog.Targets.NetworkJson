@@ -1,12 +1,15 @@
-# Gelf4NLog
+# Nlog.Targets.Gelf
 Gelf4NLog is an [NLog] target implementation to push log messages to [GrayLog2]. It implements the [Gelf] specification and communicates with GrayLog server via UDP.
 
+## History
+Code forked from https://github.com/akurdyukov/Gelf4NLog which is a fork from https://github.com/RickyKeane/Gelf4NLog who forked the origonal code from https://github.com/seymen/Gelf4NLog
+
 ## Solution
-Solution is comprised of 3 projects: *Target* is the actual NLog target implementation, *UnitTest* contains the unit tests for the NLog target, and *ConsoleRunner* is a simple console project created in order to demonstrate the library usage.
+Solution is comprised of 3 projects: *Target* is the actual NLog target implementation, *Tests* contains the unit tests for the NLog target, and *ConsoleRunner* is a simple console project created in order to demonstrate the library usage.
 ## Usage
 Use Nuget:
 ```
-PM> Install-Package Gelf4NLog.Target
+PM> Install-Package Nlog.Targets.Gelf
 ```
 ### Configuration
 Here is a sample nlog configuration snippet:
@@ -19,7 +22,7 @@ Here is a sample nlog configuration snippet:
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
 	<extensions>
-	  <add assembly="Gelf4NLog.Target"/>
+	  <add assembly="NLog.Targets.Gelf"/>
 	</extensions>
 
 	<targets>
@@ -27,10 +30,14 @@ Here is a sample nlog configuration snippet:
     
 	  <target name="graylog" 
 			  xsi:type="graylog" 
-			  hostip="192.168.1.7" 
+			  host="192.168.1.7|logs.local" 
 			  hostport="12201" 
 			  facility="console-runner"
-	  />
+	  >
+        <!-- Optional parameters -->
+        <parameter name="param1" layout="${longdate}"/>
+        <parameter name="param2" layout="${callsite}"/>
+      </target>
 	</targets>
 
 	<rules>
@@ -43,7 +50,7 @@ Here is a sample nlog configuration snippet:
 Options are the following:
 * __name:__ arbitrary name given to the target
 * __type:__ set this to "graylog"
-* __hostip:__ IP address of the GrayLog2 server
+* __host:__ IP address or Hostname of the GrayLog2 server
 * __hostport:__ Port number that GrayLog2 server is listening on
 * __facility:__ The graylog2 facility to send log messages
 
