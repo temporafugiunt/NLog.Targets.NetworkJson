@@ -28,8 +28,8 @@ Here is a sample nlog configuration snippet:
 	<targets>
 	  <!-- Other targets (e.g. console) -->
     
-	  <target name="graylog" 
-			  xsi:type="graylog" 
+	  <target name="gelf" 
+			  xsi:type="gelf" 
 			  host="192.168.1.7|logs.local" 
 			  hostport="12201" 
 			  facility="console-runner"
@@ -41,7 +41,7 @@ Here is a sample nlog configuration snippet:
 	</targets>
 
 	<rules>
-	  <logger name="*" minlevel="Debug" writeTo="graylog" />
+	  <logger name="*" minlevel="Debug" writeTo="gelf" />
 	</rules>
 
 </nlog>
