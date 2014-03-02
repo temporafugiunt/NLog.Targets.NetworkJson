@@ -12,7 +12,7 @@ Solution is comprised of 3 projects: *Target* is the actual NLog target implemen
 ## Usage
 Use Nuget:
 ```
-PM> Install-Package NLog.Targets.Gelf -IncludePrerelease
+PM> Install-Package NLog.Targets.Gelf -Pre
 ```
 ### Configuration
 Here is a sample nlog configuration snippet:
