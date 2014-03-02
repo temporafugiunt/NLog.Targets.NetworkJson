@@ -192,5 +192,10 @@ namespace NLog.Targets.Gelf
                 bitArrayIndex++;
             }
         }
+
+        public string Scheme
+        {
+            get { return "udp"; }
+        }
     }
 }

@@ -14,11 +14,10 @@ namespace NLog.Targets.Gelf
     public class GelfTarget : TargetWithLayout
     {
         private Lazy<IPEndPoint> _lazyIpEndoint;
-        [Required]
-        public string Host { get; set; }
+        private Lazy<ITransport> _lazyITransport;
 
         [Required]
-        public int HostPort { get; set; }
+        public Uri Endpoint { get; set; }
 
         [ArrayParameter(typeof(GelfParameterInfo), "parameter")]
         public IList<GelfParameterInfo> Parameters { get; private set; }
@@ -26,26 +25,35 @@ namespace NLog.Targets.Gelf
         public string Facility { get; set; }
 
         public IConverter Converter { get; private set; }
-        public ITransport Transport { get; private set; }
+        public IEnumerable<ITransport> Transports { get; private set; }
         public DnsBase Dns { get; private set; }
 
-        public GelfTarget() : this(new UdpTransport(new UdpTransportClient()), new GelfConverter(), new DnsWrapper())
+        public GelfTarget() : this(new[]{new UdpTransport(new UdpTransportClient())}, 
+            new GelfConverter(), 
+            new DnsWrapper())
         {
         }
 
-        public GelfTarget(ITransport transport, IConverter converter, DnsBase dns)
+        public GelfTarget(IEnumerable<ITransport> transports, IConverter converter, DnsBase dns)
         {
             Dns = dns;
-            Transport = transport;
+            Transports = transports;
             Converter = converter;
             this.Parameters = new List<GelfParameterInfo>();
             _lazyIpEndoint = new Lazy<IPEndPoint>(() =>
             {
-                var addresses = Dns.GetHostAddresses(Host);
+                UriBuilder builder = new UriBuilder(Endpoint);
+
+                var addresses = Dns.GetHostAddresses(builder.Host);
                 var ip = addresses
-                    .Where(x=>x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                    .Where(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                     .FirstOrDefault();
-                return new IPEndPoint(ip, HostPort);
+                return new IPEndPoint(ip, builder.Port);
+            });
+            _lazyITransport = new Lazy<ITransport>(() =>
+            {
+                UriBuilder builder = new UriBuilder(Endpoint);
+                return Transports.Single(x => x.Scheme.ToUpper() == builder.Scheme.ToUpper());
             });
         }
 
@@ -68,7 +76,8 @@ namespace NLog.Targets.Gelf
 
             var jsonObject = Converter.GetGelfJson(logEvent, Facility);
             if (jsonObject == null) return;
-            Transport.Send(_lazyIpEndoint.Value, jsonObject.ToString(Formatting.None, null));
+            _lazyITransport.Value
+                .Send(_lazyIpEndoint.Value, jsonObject.ToString(Formatting.None, null));
         }
     }
 }
