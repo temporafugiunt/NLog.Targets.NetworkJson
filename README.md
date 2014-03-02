@@ -30,8 +30,7 @@ Here is a sample nlog configuration snippet:
     
 	  <target name="gelf" 
 			  xsi:type="gelf" 
-			  host="192.168.1.7|logs.local" 
-			  hostport="12201" 
+			  endpoint="udp://logs.local:12201"
 			  facility="console-runner"
 	  >
         <!-- Optional parameters -->
