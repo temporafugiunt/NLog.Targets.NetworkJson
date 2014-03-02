@@ -42,18 +42,15 @@ namespace NLog.Targets.Gelf
             this.Parameters = new List<GelfParameterInfo>();
             _lazyIpEndoint = new Lazy<IPEndPoint>(() =>
             {
-                UriBuilder builder = new UriBuilder(Endpoint);
-
-                var addresses = Dns.GetHostAddresses(builder.Host);
+                var addresses = Dns.GetHostAddresses(Endpoint.Host);
                 var ip = addresses
                     .Where(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                     .FirstOrDefault();
-                return new IPEndPoint(ip, builder.Port);
+                return new IPEndPoint(ip, Endpoint.Port);
             });
             _lazyITransport = new Lazy<ITransport>(() =>
             {
-                UriBuilder builder = new UriBuilder(Endpoint);
-                return Transports.Single(x => x.Scheme.ToUpper() == builder.Scheme.ToUpper());
+                return Transports.Single(x => x.Scheme.ToUpper() == Endpoint.Scheme.ToUpper());
             });
         }
 
