@@ -24,7 +24,7 @@ namespace NLog.Targets.Gelf.UnitTest
                 converter.Setup(c => c.GetGelfJson(It.IsAny<LogEventInfo>(), It.IsAny<string>())).Returns(new JObject());
 
                 var target = new GelfTarget(new []{transport}, converter.Object, dnslookup.Object) {
-                    Endpoint = "udp://127.0.0.1:12201"
+                    Endpoint = new Uri( "udp://127.0.0.1:12201")
                 };
                 var logEventInfo = new LogEventInfo { Message = "Test Message" };
                 dnslookup.Setup(x => x.GetHostAddresses(It.IsAny<string>())).Returns(new[] { IPAddress.Parse("127.0.0.1") });
@@ -51,7 +51,9 @@ namespace NLog.Targets.Gelf.UnitTest
                 var transport = new UdpTransport(transportClient.Object);
                 var dnslookup = new Mock<DnsBase>();
                 dnslookup.Setup(x => x.GetHostAddresses(It.IsAny<string>())).Returns(new []{IPAddress.Parse("127.0.0.1")});
-                var target = new GelfTarget(new[] { transport }, converter.Object, dnslookup.Object) { Endpoint = "udp://127.0.0.1:12201" };
+                var target = new GelfTarget(new[] { transport }, converter.Object, dnslookup.Object) {
+                    Endpoint = new Uri("udp://127.0.0.1:12201")
+                };
                 target.WriteLogEventInfo(new LogEventInfo());
 
                 transportClient.Verify(t => t.Send(It.IsAny<byte[]>(), It.IsAny<Int32>(), It.IsAny<IPEndPoint>()), Times.Exactly(2));
