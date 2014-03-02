@@ -23,6 +23,8 @@ namespace NLog.Targets.Gelf.UnitTest
                                    };
                 logEvent.Properties.Add("customproperty1", "customvalue1");
                 logEvent.Properties.Add("customproperty2", "customvalue2");
+                logEvent.Properties.Add("custompropertyint", 199);
+                logEvent.Properties.Add("custompropertyarray", new[]{1,2,3});
 
                 var jsonObject = new GelfConverter().GetGelfJson(logEvent, "TestFacility");
 
@@ -36,13 +38,15 @@ namespace NLog.Targets.Gelf.UnitTest
                 Assert.AreEqual("TestFacility", jsonObject.Value<string>("facility"));
                 Assert.AreEqual("", jsonObject.Value<string>("file"));
                 Assert.AreEqual("", jsonObject.Value<string>("line"));
-                
+
                 Assert.AreEqual("customvalue1", jsonObject.Value<string>("_customproperty1"));
                 Assert.AreEqual("customvalue2", jsonObject.Value<string>("_customproperty2"));
+                Assert.AreEqual(199, jsonObject.Value<int>("_custompropertyint"));
+                Assert.AreEqual(new[] { 1, 2, 3 }, jsonObject["_custompropertyarray"].ToObject<int[]>());
                 Assert.AreEqual("GelfConverterTestLogger", jsonObject.Value<string>("_LoggerName"));
                 
                 //make sure that there are no other junk in there
-                Assert.AreEqual(12, jsonObject.Count);
+                Assert.AreEqual(14, jsonObject.Count);
             }
 
             [Test]

@@ -78,8 +78,6 @@ namespace NLog.Targets.Gelf
         private static void AddAdditionalField(IDictionary<string, JToken> jObject, KeyValuePair<object, object> property)
         {
             var key = property.Key as string;
-            var value = property.Value as string;
-
             if (key == null) return;
 
             //According to the GELF spec, libraries should NOT allow to send id as additional field (_id)
@@ -90,6 +88,10 @@ namespace NLog.Targets.Gelf
             //According to the GELF spec, additional field keys should start with '_' to avoid collision
             if (!key.StartsWith("_", StringComparison.OrdinalIgnoreCase))
                 key = "_" + key;
+
+            JToken value = null;
+            if(property.Value != null)
+                value = JToken.FromObject(property.Value);
 
             jObject.Add(key, value);
         }
