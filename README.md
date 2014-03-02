@@ -4,12 +4,15 @@ Gelf4NLog is an [NLog] target implementation to push log messages to [GrayLog2].
 ## History
 Code forked from https://github.com/akurdyukov/Gelf4NLog which is a fork from https://github.com/RickyKeane/Gelf4NLog who forked the origonal code from https://github.com/seymen/Gelf4NLog
 
+## Versioning
+Until v1 is released on nuget we can't promise that we wont introduce breaking changes.
+
 ## Solution
 Solution is comprised of 3 projects: *Target* is the actual NLog target implementation, *Tests* contains the unit tests for the NLog target, and *ConsoleRunner* is a simple console project created in order to demonstrate the library usage.
 ## Usage
 Use Nuget:
 ```
-PM> Install-Package NLog.Targets.Gelf
+PM> Install-Package NLog.Targets.Gelf -IncludePrerelease
 ```
 ### Configuration
 Here is a sample nlog configuration snippet:
@@ -27,16 +30,16 @@ Here is a sample nlog configuration snippet:
 
 	<targets>
 	  <!-- Other targets (e.g. console) -->
-    
+	
 	  <target name="gelf" 
 			  xsi:type="gelf" 
 			  endpoint="udp://logs.local:12201"
 			  facility="console-runner"
 	  >
-        <!-- Optional parameters -->
-        <parameter name="param1" layout="${longdate}"/>
-        <parameter name="param2" layout="${callsite}"/>
-      </target>
+		<!-- Optional parameters -->
+		<parameter name="param1" layout="${longdate}"/>
+		<parameter name="param2" layout="${callsite}"/>
+	  </target>
 	</targets>
 
 	<rules>
@@ -57,7 +60,7 @@ Options are the following:
 ```c#
 //excerpt from ConsoleRunner
 var eventInfo = new LogEventInfo
-    			{
+				{
 					Message = comic.Title,
 					Level = LogLevel.Info,
 				};

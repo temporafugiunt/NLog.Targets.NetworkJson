@@ -9,8 +9,10 @@
     <licenseUrl>https://github.com/2020Legal/NLog.Targets.Gelf/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/2020Legal/NLog.Targets.Gelf</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>NLog Target for GrayLog2</description>
-    <tags>gelf,graylog2,nlog</tags>
+    <description>
+      NLog Target for GrayLog2, DISCLAIMER: until v1 is release then we can't promise to follow SemVer therefore we might introduce breaking changes in a patch or minor release.  </description>
+    <summary>NLog Target for GrayLog2, DISCLAIMER: until v1 is release then we can't promise to follow SemVer therefore we might introduce breaking changes in a patch or minor release.  </summary>
+      <tags>gelf,graylog2,nlog</tags>
     <releaseNotes />
     <copyright>Copyright 2014</copyright>
     <language />
