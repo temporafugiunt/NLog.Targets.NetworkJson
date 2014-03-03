@@ -56,7 +56,7 @@ Here is a sample nlog configuration snippet:
 
 Options are the following:
 * __name:__ arbitrary name given to the target
-* __type:__ set this to "graylog"
+* __xsi:type:__ set this to "gelf"
 * __endpoint:__ the uri pointing to the graylog2 input in the format udp://{IP or host name}:{port} *__note:__ support is currently only for udp transport protocol*
 * __facility:__ The graylog2 facility to send log messages
 
