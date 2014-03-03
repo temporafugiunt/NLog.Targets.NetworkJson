@@ -11,8 +11,13 @@ Until v1 is released on nuget we can't promise that we wont introduce breaking c
 Solution is comprised of 3 projects: *Target* is the actual NLog target implementation, *Tests* contains the unit tests for the NLog target, and *ConsoleRunner* is a simple console project created in order to demonstrate the library usage.
 ## Usage
 Use Nuget:
+<!--- 
 ```
 PM> Install-Package NLog.Targets.Gelf -Pre
+```
+-->
+```
+PM> Install-Package NLog.Targets.Gelf
 ```
 ### Configuration
 Here is a sample nlog configuration snippet:
