@@ -77,6 +77,19 @@ namespace NLog.Targets.Gelf
 
         private static void AddAdditionalField(IDictionary<string, JToken> jObject, KeyValuePair<object, object> property)
         {
+            if(property.Key == ConverterConstants.PromoteObjectPropertiesMarker)
+            {
+                if (property.Value != null)
+                {
+                    var jo = JObject.FromObject(property.Value);
+                    foreach (var joProp in jo)
+                    {
+                        AddAdditionalField(jObject, new KeyValuePair<object, object>(joProp.Key, joProp.Value));
+                    }
+                }
+                return;
+            }
+
             var key = property.Key as string;
             if (key == null) return;
 

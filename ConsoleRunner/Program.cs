@@ -26,6 +26,8 @@ namespace NLog.Targets.Gelf.ConsoleRunner
                 eventInfo.Properties.Add("Publisher", comic.Publisher);
                 eventInfo.Properties.Add("ReleaseDate", comic.ReleaseDate);
 
+                Logger.Info(comic.Title, new { comic.Publisher, comic.ReleaseDate });
+
                 Logger.Log(eventInfo);
 
                 // sometimes throws exception

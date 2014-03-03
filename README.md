@@ -40,6 +40,7 @@ Here is a sample nlog configuration snippet:
 			  xsi:type="gelf" 
 			  endpoint="udp://logs.local:12201"
 			  facility="console-runner"
+			  sendLastFormatParameter="true"
 	  >
 		<!-- Optional parameters -->
 		<parameter name="param1" layout="${longdate}"/>
@@ -59,6 +60,7 @@ Options are the following:
 * __xsi:type:__ set this to "gelf"
 * __endpoint:__ the uri pointing to the graylog2 input in the format udp://{IP or host name}:{port} *__note:__ support is currently only for udp transport protocol*
 * __facility:__ The graylog2 facility to send log messages
+* __sendLastFormatParameter:__ default false. If true last parameter of message format will be sent to graylog as separate field per property
 
 ###Code
 ```c#
@@ -72,10 +74,15 @@ eventInfo.Properties.Add("Publisher", comic.Publisher);
 eventInfo.Properties.Add("ReleaseDate", comic.ReleaseDate);
 Logger.Log(eventInfo);
 ```
-or alternativly for simple log messages
+or alternatively for simple log messages
 ```c#
 Logger.Info("Simple message {0}", value);
 ```
+or alternatively for use of sendLastFormatParameter
+```c#
+Logger.Info(comic.Title, new { Publisher = comic.Publisher, ReleaseDate = comic.ReleaseDate });
+```
+will log Publisher and ReleaseDate as separate fields in Graylog
 
 [NLog]: http://nlog-project.org/
 [GrayLog2]: http://graylog2.org/

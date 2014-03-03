@@ -23,6 +23,7 @@ namespace NLog.Targets.Gelf
         public IList<GelfParameterInfo> Parameters { get; private set; }
 
         public string Facility { get; set; }
+        public bool SendLastFormatParameter { get; set; }
 
         public IConverter Converter { get; private set; }
         public IEnumerable<ITransport> Transports { get; private set; }
@@ -69,6 +70,13 @@ namespace NLog.Targets.Gelf
 
                     logEvent.Properties.Add(par.Name, stringValue);
                 }
+            }
+
+            if (SendLastFormatParameter && logEvent.Parameters != null && logEvent.Parameters.Any())
+            {
+                ///PromoteObjectPropertiesMarker used as property name to indicate that the value should be treated as a object 
+                ///whose proeprties should be mapped to additional fields in graylog 
+                logEvent.Properties.Add(ConverterConstants.PromoteObjectPropertiesMarker, logEvent.Parameters.Last());
             }
 
             var jsonObject = Converter.GetGelfJson(logEvent, Facility);
