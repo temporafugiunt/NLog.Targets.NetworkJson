@@ -57,8 +57,7 @@ Here is a sample nlog configuration snippet:
 Options are the following:
 * __name:__ arbitrary name given to the target
 * __type:__ set this to "graylog"
-* __host:__ IP address or Hostname of the GrayLog2 server
-* __hostport:__ Port number that GrayLog2 server is listening on
+* __endpoint:__ the uri pointing to the graylog2 input in the format udp://{IP or host name}:{port} *__note:__ support is currently only for udp transport protocol*
 * __facility:__ The graylog2 facility to send log messages
 
 ###Code
@@ -72,6 +71,10 @@ var eventInfo = new LogEventInfo
 eventInfo.Properties.Add("Publisher", comic.Publisher);
 eventInfo.Properties.Add("ReleaseDate", comic.ReleaseDate);
 Logger.Log(eventInfo);
+```
+or alternativly for simple log messages
+```c#
+Logger.Info("Simple message {0}", value);
 ```
 
 [NLog]: http://nlog-project.org/
