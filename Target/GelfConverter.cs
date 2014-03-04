@@ -79,13 +79,17 @@ namespace NLog.Targets.Gelf
         {
             if(property.Key == ConverterConstants.PromoteObjectPropertiesMarker)
             {
-                if (property.Value != null)
+                if (property.Value != null && property.Value is object)
                 {
-                    var jo = JObject.FromObject(property.Value);
-                    foreach (var joProp in jo)
+                    try
                     {
-                        AddAdditionalField(jObject, new KeyValuePair<object, object>(joProp.Key, joProp.Value));
+                        var jo = JObject.FromObject(property.Value);
+                        foreach (var joProp in jo)
+                        {
+                            AddAdditionalField(jObject, new KeyValuePair<object, object>(joProp.Key, joProp.Value));
+                        }
                     }
+                    catch { }
                 }
                 return;
             }
