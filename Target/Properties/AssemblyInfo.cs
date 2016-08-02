@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Gelf4NLog.Target")]
+[assembly: AssemblyTitle("NLog.Targets.Gelf")]
 [assembly: AssemblyDescription("NLog Target for GrayLog2")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("2020 Legal Limited")]
-[assembly: AssemblyProduct("Gelf4NLog.Target")]
-[assembly: AssemblyCopyright("Copyright © 2014")]
+[assembly: AssemblyProduct("NLog.Targets.Gelf")]
+[assembly: AssemblyCopyright("Copyright © 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
