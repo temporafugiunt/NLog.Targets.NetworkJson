@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 
 namespace NLog.Targets.Gelf
 {
@@ -15,14 +16,25 @@ namespace NLog.Targets.Gelf
     {
         private Lazy<IPEndPoint> _lazyIpEndoint;
         private Lazy<ITransport> _lazyITransport;
+        private string _facility;
+        private Uri _endpoint;
 
         [Required]
-        public Uri Endpoint { get; set; }
+        public string Endpoint
+        {
+            get { return _endpoint.ToString(); }
+            set {  _endpoint = value != null ? new Uri(Environment.ExpandEnvironmentVariables(value)) : null; }
+        }
 
         [ArrayParameter(typeof(GelfParameterInfo), "parameter")]
         public IList<GelfParameterInfo> Parameters { get; private set; }
 
-        public string Facility { get; set; }
+        public string Facility
+        {
+            get { return _facility; }
+            set { _facility = value != null ? Environment.ExpandEnvironmentVariables(value) : null; }
+        }
+
         public bool SendLastFormatParameter { get; set; }
 
         public IConverter Converter { get; private set; }
@@ -43,15 +55,14 @@ namespace NLog.Targets.Gelf
             this.Parameters = new List<GelfParameterInfo>();
             _lazyIpEndoint = new Lazy<IPEndPoint>(() =>
             {
-                var addresses = Dns.GetHostAddresses(Endpoint.Host);
-                var ip = addresses
-                    .Where(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
-                    .FirstOrDefault();
-                return new IPEndPoint(ip, Endpoint.Port);
+                var addresses = Dns.GetHostAddresses(_endpoint.Host);
+                var ip = addresses.FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork);
+
+                return new IPEndPoint(ip, _endpoint.Port);
             });
             _lazyITransport = new Lazy<ITransport>(() =>
             {
-                return Transports.Single(x => x.Scheme.ToUpper() == Endpoint.Scheme.ToUpper());
+                return Transports.Single(x => x.Scheme.ToUpper() == _endpoint.Scheme.ToUpper());
             });
         }
 
