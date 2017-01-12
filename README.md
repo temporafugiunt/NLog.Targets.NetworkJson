@@ -62,23 +62,23 @@ Options are the following:
 ### JSON Packet Description
 The *Base* JSON defined in a log message will be comprised of the following:
 
-* LogLevel – The nlog LogEventInfo’s Level property.
-* Message – The nlog LogEventInfo’s FormattedMessage property.
-* MessageType – The type of message, set from LogEventInfo’s LoggerName property.
-* LogSequenceId - The LogEventInfo’s SequenceID as set by nlog as a unique incrementing number for the life of the process.
-* ClientTimestamp – A high precision representation of the LogEventInfo’s TimeStamp property, written by NewtonSoft.Json as yyyy-MM-ddTHH:mm:ss.fffffffzzzz.
+* __logLevel:__ The nlog LogEventInfo’s Level property.
+* __message:__ The nlog LogEventInfo’s FormattedMessage property.
+* __messageType:__ The type of message, set from LogEventInfo’s LoggerName property.
+* __logSequenceId:__ The LogEventInfo’s SequenceID as set by nlog as a unique incrementing number for the life of the process.
+* _clientTimestamp:__ A high precision representation of the LogEventInfo’s TimeStamp property, written by NewtonSoft.Json as __yyyy-MM-ddTHH:mm:ss.fffffffzzzz__.
 * If UserStackFrame information is available in the LogEventInfo:
-	* Line – The file line number.
-	* File – The file full path info.
+	* __line:__ The file line number.
+	* __file:__ The file full path info.
 * If Exception information is available in the LogEventInfo:
-	* ExceptionSource – The exception source for the main exception.
-	* ExceptionMessage – The messages of the exceptions, up to 10 levels deep.
-	* StackTrace – The stack traces of the exceptions, up to 10 levels deep.
+	* __exceptionSource:__ The exception source for the main exception.
+	* __exceptionMessage:__ The messages of the exceptions, up to 10 levels deep.
+	* __stackTrace:__ The stack traces of the exceptions, up to 10 levels deep.
 
 Also included will be:
 
-* Any key/value pair defined in the LogEventInfo's Properties collection.
-* Any name/layout Parameter defined in the nlog configuration.
+* Any __key/value__ pair defined in the LogEventInfo's Properties collection.
+* Any __name/layout__ Parameter defined in the nlog configuration.
 
 ###Code
 ```c#
