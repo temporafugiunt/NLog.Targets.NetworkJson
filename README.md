@@ -66,7 +66,7 @@ The *Base* JSON defined in a log message will be comprised of the following:
 * __message:__ The nlog LogEventInfo’s FormattedMessage property.
 * __messageType:__ The type of message, set from LogEventInfo’s LoggerName property.
 * __logSequenceId:__ The LogEventInfo’s SequenceID as set by nlog as a unique incrementing number for the life of the process.
-* _clientTimestamp:__ A high precision representation of the LogEventInfo’s TimeStamp property, written by NewtonSoft.Json as __yyyy-MM-ddTHH:mm:ss.fffffffzzzz__.
+* __clientTimestamp:__ A high precision representation of the LogEventInfo’s TimeStamp property, written by NewtonSoft.Json as __yyyy-MM-ddTHH:mm:ss.fffffffzzzz__.
 * If UserStackFrame information is available in the LogEventInfo:
 	* __line:__ The file line number.
 	* __file:__ The file full path info.
