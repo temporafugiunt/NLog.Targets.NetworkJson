@@ -8,7 +8,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace NLog.Targets.Gelf
+namespace NLog.Targets.NetworkJSON
 {
     public class UdpTransport : ITransport
     {

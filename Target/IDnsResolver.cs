@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
+﻿using System.Net;
 
-namespace NLog.Targets.Gelf
+namespace NLog.Targets.NetworkJSON
 {
     public abstract class DnsBase {
         public abstract IPAddress[] GetHostAddresses(string hostNameOrAddress);

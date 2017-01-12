@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NLog.Config;
+﻿using NLog.Config;
 using NLog.Layouts;
 
-
-namespace NLog.Targets.Gelf
+namespace NLog.Targets.NetworkJSON
 {
     [NLogConfigurationItem]
-    public class GelfParameterInfo
+    public class ParameterInfo
     {
-         public GelfParameterInfo()
+         public ParameterInfo()
             : this(null, null)
         {
         }
@@ -21,7 +16,7 @@ namespace NLog.Targets.Gelf
         /// </summary>
         /// <param name="parameterName">Name of the parameter.</param>
         /// <param name="parameterLayout">The parameter layout.</param>
-         public GelfParameterInfo(string parameterName, Layout parameterLayout)
+         public ParameterInfo(string parameterName, Layout parameterLayout)
         {
             this.Name = parameterName;
             this.Layout = parameterLayout;

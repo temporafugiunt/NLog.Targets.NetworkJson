@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace NLog.Targets.Gelf
+namespace NLog.Targets.NetworkJSON
 {
     public interface ITransportClient
     {

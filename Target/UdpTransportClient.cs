@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 
-namespace NLog.Targets.Gelf
+namespace NLog.Targets.NetworkJSON
 {
     public class UdpTransportClient : ITransportClient
     {

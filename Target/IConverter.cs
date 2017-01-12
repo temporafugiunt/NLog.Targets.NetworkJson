@@ -1,10 +1,9 @@
-﻿using NLog;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
-namespace NLog.Targets.Gelf
+namespace NLog.Targets.NetworkJSON
 {
     public interface IConverter
     {
-        JObject GetGelfJson(LogEventInfo logEventInfo, string facility);
+        JObject GetLogEventJson(LogEventInfo logEventInfo);
     }
 }

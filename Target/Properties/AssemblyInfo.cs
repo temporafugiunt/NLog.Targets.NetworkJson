@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("NLog.Targets.Gelf")]
-[assembly: AssemblyDescription("NLog Target for GrayLog2")]
+[assembly: AssemblyTitle("NLog.Targets.NetworkJson")]
+[assembly: AssemblyDescription("NLog Target for JSON Communication via TCP or UDP")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("2020 Legal Limited")]
-[assembly: AssemblyProduct("NLog.Targets.Gelf")]
-[assembly: AssemblyCopyright("Copyright © 2016")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("NLog.Targets.NetworkJson")]
+[assembly: AssemblyCopyright("Copyright © 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.2.1.0")]
-[assembly: AssemblyFileVersion("0.2.1.0")]
+[assembly: AssemblyVersion("17.2.1.0112")]
+[assembly: AssemblyFileVersion("17.2.1.0112")]
