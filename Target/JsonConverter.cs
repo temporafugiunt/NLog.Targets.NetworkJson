@@ -21,7 +21,6 @@ namespace NLog.Targets.NetworkJSON
                 LogLevel = logEventInfo.Level.ToString(),
                 Message = logEventMessage,
                 LogSequenceId = logEventInfo.SequenceID,
-                MessageType = logEventInfo.LoggerName,
                 ClientTimestamp = logEventInfo.TimeStamp
             };
 

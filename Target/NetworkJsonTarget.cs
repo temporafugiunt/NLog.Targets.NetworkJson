@@ -28,6 +28,8 @@ namespace NLog.Targets.NetworkJSON
         [ArrayParameter(typeof(ParameterInfo), "parameter")]
         public IList<ParameterInfo> Parameters { get; private set; }
 
+        public bool OnFailStoreAndForward { get; set; }
+
         #endregion
 
         private IConverter Converter { get; set; }

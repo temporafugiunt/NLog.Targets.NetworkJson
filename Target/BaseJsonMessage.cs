@@ -9,9 +9,6 @@ namespace NLog.Targets.NetworkJSON
         [JsonProperty("message")]
         public string Message { get; set; }
 
-        [JsonProperty("messageType")]
-        public string MessageType { get; set; }
-        
         [JsonProperty("logSequenceId")]
         public int LogSequenceId { get; set; }
 
