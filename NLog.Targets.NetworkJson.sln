@@ -5,6 +5,10 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLog.Targets.NetworkJson", "Target\NLog.Targets.NetworkJson.csproj", "{8A614770-AEC9-42AD-87BA-CCD53F880A55}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLog.Targets.NetworkJson.Tests", "Tests\NLog.Targets.NetworkJson.Tests.csproj", "{62FA1974-4E72-489E-B6D1-A67C57B57A66}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkJsonRS", "NetworkJsonRS\NetworkJsonRS.csproj", "{76FBBC17-0898-4FA7-BCF0-870E6044FFD2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{8A614770-AEC9-42AD-87BA-CCD53F880A55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A614770-AEC9-42AD-87BA-CCD53F880A55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A614770-AEC9-42AD-87BA-CCD53F880A55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62FA1974-4E72-489E-B6D1-A67C57B57A66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62FA1974-4E72-489E-B6D1-A67C57B57A66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62FA1974-4E72-489E-B6D1-A67C57B57A66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62FA1974-4E72-489E-B6D1-A67C57B57A66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76FBBC17-0898-4FA7-BCF0-870E6044FFD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76FBBC17-0898-4FA7-BCF0-870E6044FFD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76FBBC17-0898-4FA7-BCF0-870E6044FFD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76FBBC17-0898-4FA7-BCF0-870E6044FFD2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

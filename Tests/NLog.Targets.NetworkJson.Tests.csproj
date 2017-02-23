@@ -8,8 +8,8 @@
     <ProjectGuid>{62FA1974-4E72-489E-B6D1-A67C57B57A66}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NLog.Targets.Gelf.Tests</RootNamespace>
-    <AssemblyName>NLog.Targets.Gelf.Tests</AssemblyName>
+    <RootNamespace>NLog.Targets.NetworkJson.Tests</RootNamespace>
+    <AssemblyName>NLog.Targets.NetworkJson.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -64,7 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GelfConverterTest.cs" />
+    <Compile Include="JsonConverterTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\ResourceHelper.cs" />
     <Compile Include="UdpTransportTest.cs" />
@@ -73,9 +73,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Target\NLog.Targets.Gelf.csproj">
+    <ProjectReference Include="..\Target\NLog.Targets.NetworkJson.csproj">
       <Project>{8A614770-AEC9-42AD-87BA-CCD53F880A55}</Project>
-      <Name>NLog.Targets.Gelf</Name>
+      <Name>NLog.Targets.NetworkJson</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

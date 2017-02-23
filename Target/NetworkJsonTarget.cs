@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using Newtonsoft.Json;
 using NLog.Config;
+using NLog.Layouts;
 
 namespace NLog.Targets.NetworkJSON
 {
@@ -24,7 +25,7 @@ namespace NLog.Targets.NetworkJSON
             get { return _endpoint.ToString(); }
             set {  _endpoint = value != null ? new Uri(Environment.ExpandEnvironmentVariables(value)) : null; }
         }
-
+        
         [ArrayParameter(typeof(ParameterInfo), "parameter")]
         public IList<ParameterInfo> Parameters { get; private set; }
 

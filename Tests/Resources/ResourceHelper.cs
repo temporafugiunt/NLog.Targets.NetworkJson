@@ -2,7 +2,7 @@
 using System.Reflection;
 using NUnit.Framework;
 
-namespace NLog.Targets.Gelf.Tests.Resources
+namespace NLog.Targets.NetworkJson.Tests.Resources
 {
     internal class ResourceHelper
     {
