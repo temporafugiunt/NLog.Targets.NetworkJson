@@ -1,0 +1,106 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="BuildTestAndPublish;CreateEnvironmentConfigs;PublishReleaseStatistics">
+	<Import Project="$(MSBUILD_CUSTOM_HOME)\DefineTasks.targets" />
+  <PropertyGroup>
+    <SolutionDirectory>$(WORKSPACE)</SolutionDirectory>
+    <SolutionFile>$(SolutionDirectory)\PVWorkLists.sln</SolutionFile>
+    <ApplicationName Condition="$(JOB_NAME.StartsWith('Build '))">$(JOB_NAME.Substring(6))</ApplicationName>
+    <ApplicationName Condition="!$(JOB_NAME.StartsWith('Build '))">$(JOB_NAME)</ApplicationName>
+    <IncludeBinariesInSourceZip>false</IncludeBinariesInSourceZip>
+    <MainlineVersionOverride>16.0</MainlineVersionOverride>
+  </PropertyGroup>
+  <Target Name="BuildTestAndPublish">
+    <CallTarget Targets="MsgAppBuildStart" />
+    <CallTarget Targets="ShowGitInfo" />
+    
+	<Exec Command="nuget.exe restore &quot;$(SolutionFile)&quot;" WorkingDirectory="$(SolutionDirectory)\.nuget" />
+    <!-- 
+      MAJOR.MINOR VERSION OVERRIDE NOTE: 
+      
+      If you want to deviate from mainline version on Jenkins Server, you can override with MainlineVersionOverride defined above, otherwise
+      use the environment variable CURRENT_MAINLINE_VERSION instead.
+    -->
+    <DefineAppVersion BuildNumber="$(BUILD_NUMBER)" MainlineVersion="$(CURRENT_MAINLINE_VERSION)" GitBranch="$(GIT_BRANCH)" Verbose="$(VERBOSE)" >
+      <Output TaskParameter="ApplicationVersion" PropertyName="ApplicationVersion" />
+    </DefineAppVersion>
+    <Exec Command="CopyLibsFromOfficial.Release.bat &quot;$(BASE_REPO_HOME)&quot;" WorkingDirectory="$(SolutionDirectory)" />
+    <SetVersionInfoFile SolutionType="cs" SolutionDirectory="$(SolutionDirectory)" Company="$(COMPANY)" ApplicationName="$(ApplicationName)" ApplicationVersion="$(ApplicationVersion)" Verbose="$(VERBOSE)" />
+
+    <!-- Build Debug version, run all unit tests, if successful publish to the repository. --> 
+    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Debug;Platform=Any CPU" Targets="Clean;Build" />
+    <NUnit Assemblies="$(SolutionDirectory)\DAL\WorklistManagers\PV.Worklists.Managers.Tests\bin\Debug\PV.WorkLists.Managers.Tests.dll" ToolPath="$(NUNIT_HOME)" />
+    <NUnit Assemblies="$(SolutionDirectory)\PVWorkLists.Test\bin\Debug\PVWorkLists.Test.dll" ToolPath="$(NUNIT_HOME)" />
+    
+	  <!-- Push application -->
+	  <PushToRepository ApplicationName="$(ApplicationName)" ApplicationVersion="$(ApplicationVersion)" PushToDirectory="Debug" SourceDirectoryOrFile="$(SolutionDirectory)\PVWorkLists\bin\Debug" BaseRepositoryLocation="$(BASE_REPO_HOME)" Verbose="$(VERBOSE)">
+      <Output TaskParameter="RepositoryInfo" ItemName="RepositoryInfo" />
+    </PushToRepository>
+
+    <!-- Build Release version and publish to the repository. --> 
+    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Release;Platform=Any CPU" Targets="Clean;Build" />
+  
+    <PushToRepository ApplicationName="$(ApplicationName)" ApplicationVersion="$(ApplicationVersion)" PushToDirectory="Release" SourceDirectoryOrFile="$(SolutionDirectory)\PVWorkLists\bin\Release" BaseRepositoryLocation="$(BASE_REPO_HOME)" Verbose="$(VERBOSE)" />
+    <OnError ExecuteTargets="InformUsersOnError" />
+  </Target>
+
+  <Target Name="CreateEnvironmentConfigs">
+
+    <!-- Create Configuration Files for Each Environment -->
+    <ItemGroup>
+      <FileDefinition Include="nlog.config">
+        <SourceDir>$(SolutionDirectory)\PVWorkLists</SourceDir>
+        <OutputName>NLog.config</OutputName>
+        <KeyAttributes>name</KeyAttributes>
+        <AllowMissingUpdateFile>false</AllowMissingUpdateFile>
+      </FileDefinition>
+      <FileDefinition Include="app.config">
+        <SourceDir>$(SolutionDirectory)\PVWorkLists</SourceDir>
+        <OutputName>PVWorkLists.exe.config</OutputName>
+        <KeyAttributes>name|key|statusCode</KeyAttributes>
+        <UseIndexes>false</UseIndexes>
+        <ExpansionArray>VERSION^$(ApplicationVersion)</ExpansionArray>
+        <AllowMissingUpdateFile>false</AllowMissingUpdateFile>
+      </FileDefinition>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Environment Include="DEV" />
+      <Environment Include="STAGE" />
+      <Environment Include="ST2" />
+      <Environment Include="PROD" />
+    </ItemGroup>
+
+    <!-- Combine file list and environment list -->
+    <!--<CreateItem Include="@(FileDefinition)" AdditionalMetadata="Env=%(Environment.Identity)">
+      <Output ItemName="FileEnvDefinition" TaskParameter="Include" />
+    </CreateItem>-->
+    <ItemGroup>
+      <FileEnvDefinition Include="@(FileDefinition)">
+        <Env>%(Environment.Identity)</Env>
+      </FileEnvDefinition>
+    </ItemGroup>
+
+    <PropertyGroup>
+      <RepoDestination>%(RepositoryInfo.ConfigPath)</RepoDestination>
+    </PropertyGroup>
+
+    <UpdateXmlFile SourceXMLFile="%(FileEnvDefinition.SourceDir)\%(FileEnvDefinition.Identity)" DestinationXMLFile="$(RepoDestination)\%(FileEnvDefinition.Env)\%(FileEnvDefinition.OutputName)"
+                   UpdateXMLFile="%(FileEnvDefinition.SourceDir)\%(FileEnvDefinition.Identity).%(FileEnvDefinition.Env)-DIFF.xml" AllowMissingUpdateFile="%(FileEnvDefinition.AllowMissingUpdateFile)" UseIndexes="%(FileEnvDefinition.UseIndexes)"
+                   ElementsToIndex="%(FileEnvDefinition.ElementsToIndex)" KeyAttributes="%(FileEnvDefinition.KeyAttributes)" OverwriteExisting="%(FileEnvDefinition.OverwriteExisting)"
+                   ExpansionArray="%(FileEnvDefinition.ExpansionArray)" DeleteNodeArray="%(FileEnvDefinition.DeleteNodeArray)" Verbose="$(VERBOSE)" />
+
+    <OnError ExecuteTargets="InformUsersOnError" />
+  </Target>
+  
+  <Import Project="$(MSBUILD_CUSTOM_HOME)\PublishRelease.targets" />
+
+  <Target Name="PublishReleaseStatistics">
+    <CallTarget Targets="CreateGitInfoFile" />
+    <CallTarget Targets="ZipAndPublishSource" />
+    <CallTarget Targets="PublishApplicationInfo" />
+    <CallTarget Targets="MsgAppBuildComplete" />
+  </Target>
+    
+  <Target Name="InformUsersOnError">
+    <CallTarget Targets="MsgAppBuildFailed" />
+  </Target>
+</Project>

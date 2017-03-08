@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="TestData0" xml:space="preserve">
+    <value>{"message":"Here is a message that should not have headers in its data portion.","logSequenceId":8,"logLevel":"Info","clientTimestamp":"2017-02-27T16:53:37.9866989-06:00","severity":10,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"Instrumentation","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-instrumentation","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":"This was data added above the info message.\nJust want to make sure this shows up in data WITHOUT a header. [2025 ms]\r\nAnother message I pushed into the info queue. [2025 ms]\r\n","practice":"JamesEby","clinic":null,"methodSignature":"Void InstrumentationTests.TestConsolidatedLogLevelWritesWithQueueing()","executionTimeMS":2025,"executionTimeMinutes":0.033753013333333332,"itemCount":0,"byteCount":0,"failedItemCount":0,"failedByteCount":0}</value>
+  </data>
+  <data name="TestData1" xml:space="preserve">
+    <value>{"message":"Execution Complete","logSequenceId":9,"logLevel":"Error","clientTimestamp":"2017-02-27T16:53:40.0452941-06:00","severity":30,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"Instrumentation","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-instrumentation","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":"File Error\n","practice":"JamesEby","clinic":null,"methodSignature":"Void InstrumentationTests.TestIndividualLogLevelWritesWithQueueing()","executionTimeMS":2001,"executionTimeMinutes":0.033357641666666667,"itemCount":0,"byteCount":0,"failedItemCount":1,"failedByteCount":0,"ExceptionSource":null,"ExceptionMessage":"Couldn't find c:\\blahblah","StackTrace":null}</value>
+  </data>
+  <data name="TestData10" xml:space="preserve">
+    <value>{"message":"File write operation to 'C:\\Users\\jeby\\AppData\\Local\\Temp\\lt4uvv43.2d1' successful.","logSequenceId":19,"logLevel":"Info","clientTimestamp":"2017-02-27T16:53:42.5728527-06:00","severity":10,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"ConfigValidation","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-configvalidation","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":""}</value>
+  </data>
+  <data name="TestData11" xml:space="preserve">
+    <value>{"message":"The Info Push stack is clean","logSequenceId":25,"logLevel":"Info","clientTimestamp":"2017-02-27T16:53:44.6879448-06:00","severity":10,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"LogMessage","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-logmessage","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":"","practice":"EunEby","userId":null,"invoiceNumber":"4456456","patientNumber":null,"clinic":null}</value>
+  </data>
+  <data name="TestData12" xml:space="preserve">
+    <value>{"message":"The Info Push stack is clean","logSequenceId":11,"logLevel":"Info","clientTimestamp":"2017-02-27T16:53:40.0962362-06:00","severity":10,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"Instrumentation","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-instrumentation","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":"","practice":"JamesEby","clinic":null,"methodSignature":"Void InstrumentationTests.TestIndividualLogLevelWritesWithQueueing()","executionTimeMS":2001,"executionTimeMinutes":0.033357641666666667,"itemCount":0,"byteCount":0,"failedItemCount":0,"failedByteCount":0}</value>
+  </data>
+  <data name="TestData13" xml:space="preserve">
+    <value>{"message":"The Info Push stack is   clean","logSequenceId":16,"logLevel":"Info","clientTimestamp":"2017-02-27T16:53:42.2346967-06:00","severity":10,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"LogMessage","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-logmessage","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":"","practice":"EunEby","userId":null,"invoiceNumber":null,"patientNumber":null,"clinic":null}</value>
+  </data>
+  <data name="TestData14" xml:space="preserve">
+    <value>{"message":"Starting the app logging","logSequenceId":20,"logLevel":"Trace","clientTimestamp":"2017-02-27T16:53:42.5964205-06:00","severity":0,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"LogMessage","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-logmessage","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":"","practice":null,"userId":null,"invoiceNumber":null,"patientNumber":null,"clinic":null}</value>
+  </data>
+  <data name="TestData15" xml:space="preserve">
+    <value>{"message":"Finish up the logging test","logSequenceId":24,"logLevel":"Info","clientTimestamp":"2017-02-27T16:53:44.6703891-06:00","severity":10,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"LogMessage","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-logmessage","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":"First one --&gt; This is some data I want to track but not log just yet\r\nsecond one --&gt; This is some more data I want to track but not log just yet\r\nEun --&gt; saying hi to Eun\r\nTime 1 --&gt; 4:53:42 PM\r\nTime 2 --&gt; 4:53:44 PM\r\nlast one --&gt; Ok Ready to write to log now\r\n","practice":"EunEby","userId":null,"invoiceNumber":"4456456","patientNumber":null,"clinic":null}</value>
+  </data>
+  <data name="TestData16" xml:space="preserve">
+    <value>{"message":"Starting the app logging","logSequenceId":14,"logLevel":"Trace","clientTimestamp":"2017-02-27T16:53:40.1930338-06:00","severity":0,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"LogMessage","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-logmessage","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":"","practice":null,"userId":null,"invoiceNumber":null,"patientNumber":null,"clinic":null}</value>
+  </data>
+  <data name="TestData17" xml:space="preserve">
+    <value>{"message":"Practice was set","logSequenceId":21,"logLevel":"Info","clientTimestamp":"2017-02-27T16:53:42.6144681-06:00","severity":10,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"LogMessage","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-logmessage","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":"","practice":"EunEby","userId":null,"invoiceNumber":"4456456","patientNumber":null,"clinic":null}</value>
+  </data>
+  <data name="TestData2" xml:space="preserve">
+    <value>{"message":"Status of directory write operation check.","logSequenceId":18,"logLevel":"Info","clientTimestamp":"2017-02-27T16:53:42.5457901-06:00","severity":10,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"ConfigValidation","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-configvalidation","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":"File write operation to 'C:\\2aaf7f42-8f4a-4fda-a15f-40eba11c20a2' FAILED with exception message Could not find a part of the path 'C:\\2aaf7f42-8f4a-4fda-a15f-40eba11c20a2\\Access-f0d0b4aa-c14d-4672-994f-e41320036dfd.txt'..\r\n"}</value>
+  </data>
+  <data name="TestData3" xml:space="preserve">
+    <value>{"message":"General Error","logSequenceId":23,"logLevel":"Error","clientTimestamp":"2017-02-27T16:53:44.6538439-06:00","severity":30,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"LogMessage","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-logmessage","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":"","practice":"EunEby","userId":null,"invoiceNumber":"4456456","patientNumber":null,"clinic":null,"ExceptionSource":null,"ExceptionMessage":"Unable to find the specified file.","StackTrace":null}</value>
+  </data>
+  <data name="TestData4" xml:space="preserve">
+    <value>{"message":"Application Run Summary","logSequenceId":26,"logLevel":"Info","clientTimestamp":"2017-02-27T16:53:44.7145045-06:00","severity":10,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"Instrumentation","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-instrumentation","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":"--------------------------------------------------------------------------------\r\n------------------------    Application Run Summary    -------------------------\r\n--------------------------------------------------------------------------------\r\nStart Time --&gt; 2/27/2017 4:53:38 PM\r\nEnd Time --&gt; 2/27/2017 4:53:44 PM\r\nTotal Time --&gt; 00:00:06.6706716\r\nTotal Fatals --&gt; 0\r\nTotal Errors --&gt; 3\r\nTotal Warns --&gt; 0\r\nTotal Info --&gt; 10\r\nTotal Debug --&gt; 0\r\nTotal Trace --&gt; 4\r\n","startTime":"2/27/2017 4:53:38 PM","endTime":"2/27/2017 4:53:44 PM","executionTimeMinutes":0.11117786,"executionTimeMS":670,"totalFatals":0,"totalErrors":3,"totalWarns":0,"totalInfo":10,"totalDebug":0,"totalTrace":4}</value>
+  </data>
+  <data name="TestData5" xml:space="preserve">
+    <value>{"message":"Testing Trace","logSequenceId":13,"logLevel":"Trace","clientTimestamp":"2017-02-27T16:53:40.1664462-06:00","severity":0,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"LogMessage","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-logmessage","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":"","practice":null,"userId":null,"invoiceNumber":null,"patientNumber":null,"clinic":null}</value>
+  </data>
+  <data name="TestData6" xml:space="preserve">
+    <value>{"message":"Execution Complete","logSequenceId":1,"logLevel":"Info","clientTimestamp":"2017-02-27T16:53:35.1972515-06:00","severity":10,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"Instrumentation","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-instrumentation","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":"Some Extra Data I added as a part of Log Method, should be above items with headers.\n\r\n-----------------------------    Fatal Messages    -----------------------------\r\n\r\nWow, this is a REALLY BAD ERROR!\r\n\r\n-----------------------------    Error Messages    -----------------------------\r\n\r\nSome file had an issue!\r\n\r\n----------------------------    Warning Messages    ----------------------------\r\n\r\nWarning Time 2 [2023 ms]\r\n\r\n-----------------------------    Info Messages    ------------------------------\r\n\r\nPractice was set\r\nSecond Info Statement --&gt; This is some data I want to track but not log just yet\r\nThird Info Statement --&gt; This is some more data I want to track but not log just yet\r\nInfo Time 1 [22 ms]\r\nlast one --&gt; Ok Ready to write to log now\r\n\r\n-----------------------------    Debug Messages    -----------------------------\r\n\r\nTest Starting\r\nJames --&gt; saying hi to Eun\r\n\r\n-----------------------------    Trace Messages    -----------------------------\r\n\r\nGettting ready to log the error.\r\n","practice":"JamesEby","clinic":null,"methodSignature":"Void InstrumentationTests.TestConsolidatedLogLevelWritesWithQueueing()","executionTimeMS":2025,"executionTimeMinutes":0.033753013333333332,"itemCount":27,"byteCount":43284032,"failedItemCount":0,"failedByteCount":0}</value>
+  </data>
+  <data name="TestData7" xml:space="preserve">
+    <value>{"message":"Gettting ready to log the error.","logSequenceId":22,"logLevel":"Trace","clientTimestamp":"2017-02-27T16:53:44.6262706-06:00","severity":0,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"LogMessage","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-logmessage","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":"","practice":"EunEby","userId":null,"invoiceNumber":"4456456","patientNumber":null,"clinic":null}</value>
+  </data>
+  <data name="TestData8" xml:space="preserve">
+    <value>{"message":"Finish up the logging test","logSequenceId":10,"logLevel":"Info","clientTimestamp":"2017-02-27T16:53:40.073174-06:00","severity":10,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"Instrumentation","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-instrumentation","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":"Practice was set\r\nSecond Info Statement --&gt; This is some data I want to track but not log just yet\r\nThird Info Statement --&gt; This is some more data I want to track but not log just yet\r\nInfo Time 1 [0 ms]\r\nlast one --&gt; Ok Ready to write to log now\r\n","practice":"JamesEby","clinic":null,"methodSignature":"Void InstrumentationTests.TestIndividualLogLevelWritesWithQueueing()","executionTimeMS":2001,"executionTimeMinutes":0.033357641666666667,"itemCount":0,"byteCount":0,"failedItemCount":0,"failedByteCount":0}</value>
+  </data>
+  <data name="TestData9" xml:space="preserve">
+    <value>{"message":"General Error","logSequenceId":12,"logLevel":"Error","clientTimestamp":"2017-02-27T16:53:40.1293862-06:00","severity":30,"applicationLoggingId":"pv-testapp-pvlogging","messageType":"LogMessage","applicationName":"PV.Logging.Tests","applicationVersion":"1.2.3.4","logger":"pv-testapp-pvlogging-logmessage","loggerVersion":"4.3.2.1","userName":"PV\\jeby","processName":"JetBrains.ReSharper.TaskRunner.CLR45.x64","hostName":"pvbmprl0036","data":"","practice":"TEST","userId":null,"invoiceNumber":null,"patientNumber":null,"clinic":null}</value>
+  </data>
+</root>

@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 
-namespace NLog.Targets.NetworkJSON.Extensions
+namespace NLog.Targets.NetworkJSON.ExtensionMethods
 {
     public static class StringExtensions
     {
@@ -41,6 +35,13 @@ namespace NLog.Targets.NetworkJSON.Extensions
             return (str.ToUpper());
         }
 
+        public static string SafeTrimUpper(this string str)
+        {
+            if (str.IsNullOrEmpty()) return string.Empty;
+
+            return (str.Trim().ToUpper());
+        }
+
         public static bool IsSameCommandLineArg(this string arg, string argExpected)
         {
             if (argExpected.StartsWith("/") || argExpected.StartsWith("-"))
@@ -54,6 +55,11 @@ namespace NLog.Targets.NetworkJSON.Extensions
             }
 
             return (arg.CompareNoCase(argExpected));
+        }
+
+        public static bool StartsWithCommandLineArg(this string arg, string argExpected)
+        {
+            return arg.SafeToUpper().StartsWith($"/{argExpected.SafeToUpper()}") || arg.SafeToUpper().StartsWith($"-{argExpected.SafeToUpper()}");
         }
     }
 }

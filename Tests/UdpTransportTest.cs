@@ -2,11 +2,10 @@
 using System.Net;
 using Moq;
 using Newtonsoft.Json.Linq;
-using NLog.Targets.NetworkJson.Tests.Resources;
-using NLog.Targets.NetworkJSON;
+using NLog.Targets.NetworkJSON.Tests.Resources;
 using NUnit.Framework;
 
-namespace NLog.Targets.NetworkJson.Tests
+namespace NLog.Targets.NetworkJSON.Tests
 {
     public class UdpTransportTest
     {

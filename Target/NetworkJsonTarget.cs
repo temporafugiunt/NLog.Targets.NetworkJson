@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NLog.Config;
 using NLog.Layouts;
@@ -81,8 +82,16 @@ namespace NLog.Targets.NetworkJSON
             
             var jsonObject = Converter.GetLogEventJson(logEvent);
             if (jsonObject == null) return;
-            _lazyITransport.Value
-                .Send(_lazyIpEndoint.Value, jsonObject.ToString(Formatting.None, null));
+            var logEventAsJsonString = jsonObject.ToString(Formatting.None, null);
+            Write(logEventAsJsonString);
+        }
+
+        /// <summary>
+        /// Exposed for the guaranteed delivery service to use.
+        /// </summary>
+        public void Write(string logEventAsJsonString)
+        {
+            _lazyITransport.Value.Send(_lazyIpEndoint.Value, logEventAsJsonString);
         }
     }
 }

@@ -3,30 +3,54 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLog.Targets.NetworkJson", "Target\NLog.Targets.NetworkJson.csproj", "{8A614770-AEC9-42AD-87BA-CCD53F880A55}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLog.Targets.NetworkJSON", "Target\NLog.Targets.NetworkJSON.csproj", "{8A614770-AEC9-42AD-87BA-CCD53F880A55}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLog.Targets.NetworkJson.Tests", "Tests\NLog.Targets.NetworkJson.Tests.csproj", "{62FA1974-4E72-489E-B6D1-A67C57B57A66}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLog.Targets.NetworkJSON.Tests", "Tests\NLog.Targets.NetworkJSON.Tests.csproj", "{62FA1974-4E72-489E-B6D1-A67C57B57A66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkJsonRS", "NetworkJsonRS\NetworkJsonRS.csproj", "{76FBBC17-0898-4FA7-BCF0-870E6044FFD2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDNetworkJSONService", "GDNetworkJSONService\GDNetworkJSONService.csproj", "{76FBBC17-0898-4FA7-BCF0-870E6044FFD2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLog.Targets.NetworkJSON.LoadTester", "LoadTester\NLog.Targets.NetworkJSON.LoadTester.csproj", "{FAC7E618-5DEC-4ED5-A769-53A429642D45}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{8A614770-AEC9-42AD-87BA-CCD53F880A55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8A614770-AEC9-42AD-87BA-CCD53F880A55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A614770-AEC9-42AD-87BA-CCD53F880A55}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8A614770-AEC9-42AD-87BA-CCD53F880A55}.Debug|x86.Build.0 = Debug|Any CPU
 		{8A614770-AEC9-42AD-87BA-CCD53F880A55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A614770-AEC9-42AD-87BA-CCD53F880A55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A614770-AEC9-42AD-87BA-CCD53F880A55}.Release|x86.ActiveCfg = Release|Any CPU
+		{8A614770-AEC9-42AD-87BA-CCD53F880A55}.Release|x86.Build.0 = Release|Any CPU
 		{62FA1974-4E72-489E-B6D1-A67C57B57A66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{62FA1974-4E72-489E-B6D1-A67C57B57A66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62FA1974-4E72-489E-B6D1-A67C57B57A66}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{62FA1974-4E72-489E-B6D1-A67C57B57A66}.Debug|x86.Build.0 = Debug|Any CPU
 		{62FA1974-4E72-489E-B6D1-A67C57B57A66}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62FA1974-4E72-489E-B6D1-A67C57B57A66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62FA1974-4E72-489E-B6D1-A67C57B57A66}.Release|x86.ActiveCfg = Release|Any CPU
+		{62FA1974-4E72-489E-B6D1-A67C57B57A66}.Release|x86.Build.0 = Release|Any CPU
 		{76FBBC17-0898-4FA7-BCF0-870E6044FFD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{76FBBC17-0898-4FA7-BCF0-870E6044FFD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76FBBC17-0898-4FA7-BCF0-870E6044FFD2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{76FBBC17-0898-4FA7-BCF0-870E6044FFD2}.Debug|x86.Build.0 = Debug|Any CPU
 		{76FBBC17-0898-4FA7-BCF0-870E6044FFD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{76FBBC17-0898-4FA7-BCF0-870E6044FFD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76FBBC17-0898-4FA7-BCF0-870E6044FFD2}.Release|x86.ActiveCfg = Release|Any CPU
+		{76FBBC17-0898-4FA7-BCF0-870E6044FFD2}.Release|x86.Build.0 = Release|Any CPU
+		{FAC7E618-5DEC-4ED5-A769-53A429642D45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAC7E618-5DEC-4ED5-A769-53A429642D45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAC7E618-5DEC-4ED5-A769-53A429642D45}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FAC7E618-5DEC-4ED5-A769-53A429642D45}.Debug|x86.Build.0 = Debug|Any CPU
+		{FAC7E618-5DEC-4ED5-A769-53A429642D45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAC7E618-5DEC-4ED5-A769-53A429642D45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FAC7E618-5DEC-4ED5-A769-53A429642D45}.Release|x86.ActiveCfg = Release|Any CPU
+		{FAC7E618-5DEC-4ED5-A769-53A429642D45}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Net;
-using NLog.Targets.NetworkJSON;
 using NUnit.Framework;
 
-namespace NLog.Targets.NetworkJson.Tests
+namespace NLog.Targets.NetworkJSON.Tests
 {
     public class JsonConverterTest
     {
