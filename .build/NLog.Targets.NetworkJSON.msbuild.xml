@@ -2,7 +2,7 @@
 	<Import Project="$(MSBUILD_CUSTOM_HOME)\DefineTasks.targets" />
   <PropertyGroup>
     <SolutionDirectory>$(WORKSPACE)</SolutionDirectory>
-    <SolutionFile>$(SolutionDirectory)\PVWorkLists.sln</SolutionFile>
+    <SolutionFile>$(SolutionDirectory)\NLog.Targets.NetworkJSON.sln</SolutionFile>
     <ApplicationName1>NLog.Targets.NetworkJSON</ApplicationName1>
     <ApplicationName2>Guaranteed Delivery NetworkJSON Service</ApplicationName2>
     <IncludeBinariesInSourceZip>false</IncludeBinariesInSourceZip>
