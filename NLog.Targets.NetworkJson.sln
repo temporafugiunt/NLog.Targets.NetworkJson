@@ -11,6 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDNetworkJSONService", "GDN
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLog.Targets.NetworkJSON.LoadTester", "LoadTester\NLog.Targets.NetworkJSON.LoadTester.csproj", "{FAC7E618-5DEC-4ED5-A769-53A429642D45}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{1ABFAF54-7B84-4D47-9D5A-E6162F01991E}"
+	ProjectSection(SolutionItems) = preProject
+		.build\NLog.Targets.NetworkJSON.msbuild.xml = .build\NLog.Targets.NetworkJSON.msbuild.xml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

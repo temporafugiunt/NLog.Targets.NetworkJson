@@ -64,3 +64,6 @@ _ReSharper*/
 Deploy
 packages
 *.DotSettings
+
+lib
+_lib

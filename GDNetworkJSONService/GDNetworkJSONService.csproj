@@ -158,6 +158,9 @@
     <Content Include="app.config.ST2-DIFF.xml">
       <DependentUpon>app.config</DependentUpon>
     </Content>
+    <Content Include="app.config.ST3-DIFF.xml">
+      <DependentUpon>app.config</DependentUpon>
+    </Content>
     <Content Include="app.config.STAGE-DIFF.xml">
       <DependentUpon>app.config</DependentUpon>
     </Content>
@@ -170,6 +173,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="NLog.config.ST2-DIFF.xml">
+      <DependentUpon>NLog.config</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="NLog.config.ST3-DIFF.xml">
       <DependentUpon>NLog.config</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
