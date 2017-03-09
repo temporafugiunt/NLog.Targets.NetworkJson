@@ -23,7 +23,9 @@
       <Output TaskParameter="ApplicationVersion" PropertyName="ApplicationVersion" />
     </DefineAppVersion>
     <Exec Command="CopyLibsFromOfficial.Release.bat &quot;$(BASE_REPO_HOME)&quot;" WorkingDirectory="$(SolutionDirectory)" />
-    <SetVersionInfoFile SolutionType="cs" SolutionDirectory="$(SolutionDirectory)" Company="$(COMPANY)" ApplicationName="$(ApplicationName)" ApplicationVersion="$(ApplicationVersion)" Verbose="$(VERBOSE)" />
+    <SetVersionInfoFile SolutionType="cs" SolutionDirectory="$(SolutionDirectory)" AssemblySubdirectory="Target" Company="$(COMPANY)" ApplicationName="$(ApplicationName1)" ApplicationVersion="$(ApplicationVersion)" Verbose="$(VERBOSE)" />
+    
+    <SetVersionInfoFile SolutionType="cs" SolutionDirectory="$(SolutionDirectory)" AssemblySubdirectory="GDNetworkJSONService" Company="$(COMPANY)" ApplicationName="$(ApplicationName2)" ApplicationVersion="$(ApplicationVersion)" Verbose="$(VERBOSE)" />
 
     <!-- Build Debug version, run all unit tests, if successful publish both apps to the repository. --> 
     <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Debug;Platform=Any CPU" Targets="Clean;Build" />
