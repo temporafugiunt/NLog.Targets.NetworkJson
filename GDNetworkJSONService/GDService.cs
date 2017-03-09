@@ -3,10 +3,10 @@ using System.ServiceProcess;
 using System.Threading;
 using GDNetworkJSONService;
 using GDNetworkJSONService.ExtensionMethods;
-using GDNetworkJSONService.GuaranteedDelivery;
 using GDNetworkJSONService.LocalLogStorageDB;
 using GDNetworkJSONService.Loggers;
 using GDNetworkJSONService.Models;
+using GDNetworkJSONService.ServiceThreads;
 using Microsoft.Owin;
 using Microsoft.Owin.Hosting;
 using NLog.Targets.NetworkJSON.ExtensionMethods;
@@ -19,13 +19,14 @@ namespace GDNetworkJSONService
     {
         private IDisposable _signalR;
         private GuaranteedDeliveryThreadDelegate _guaranteedDeliveryThreadDelegate;
+        private GuaranteedDeliveryThreadDelegate _guaranteedDeliveryBackupThreadDelegate;
 
         private CommandLineModel _commandLineModel;
 
         public GDService(CommandLineModel model)
         {
             _commandLineModel = model;
-            ServiceName = "NetworkJSON Guaranteed Delivery Service";
+            ServiceName = "Guaranteed Delivery NetworkJSON Service";
             InitializeComponent();
         }
 
@@ -46,13 +47,19 @@ namespace GDNetworkJSONService
 
             try
             {
-                using (var dbConnection = LocalLogStorageDB.LogStorageDbGlobals.OpenNewConnection())
+                using (var dbConnection = LogStorageDbGlobals.OpenNewConnection())
                 {
                     if (!LogStorageTable.TableExists(dbConnection))
                     {
-                        logger.PushInfoWithTime($"{LogStorageTable.TableName} does not exist, creating.");
+                        logger.PushInfo($"{LogStorageTable.TableName} does not exist, creating.");
                         LogStorageTable.CreateTable(dbConnection);
                         logger.PushInfoWithTime($"{LogStorageTable.TableName} created.");
+                    }
+                    if (!DeadLetterLogStorageTable.TableExists(dbConnection))
+                    {
+                        logger.PushInfo($"{DeadLetterLogStorageTable.TableName} does not exist, creating.");
+                        DeadLetterLogStorageTable.CreateTable(dbConnection);
+                        logger.PushInfoWithTime($"{DeadLetterLogStorageTable.TableName} created.");
                     }
                 }
             }
@@ -81,40 +88,47 @@ namespace GDNetworkJSONService
                 var thread = new Thread(() => GuaranteedDeliveryThread.ThreadMethod(_guaranteedDeliveryThreadDelegate));
                 thread.Start();
                 logger.PushInfoWithTime("Guaranteed Delivery Thread Started.");
+
+                _guaranteedDeliveryBackupThreadDelegate = new GuaranteedDeliveryThreadDelegate();
+
+                thread = new Thread(() => GuaranteedDeliveryBackupThread.ThreadMethod(_guaranteedDeliveryBackupThreadDelegate));
+                thread.Start();
+                logger.PushInfoWithTime("Guaranteed Delivery Backup Thread Started.");
             }
             catch (Exception ex)
             {
-                throw new Exception("Guaranteed Delivery Thread Initialization Failed.", ex);
+                throw new Exception("Guaranteed Delivery Threads Initialization Failed.", ex);
             }
 
             logger.LogExecutionComplete(0);
         }
 
-        
-
         protected override void OnStop()
         {
             var logger = LoggerFactory.GetInstrumentationLogger();
+            var numMs = 0;
             logger.InitializeExecutionLogging($"{this.GetRealServiceName(ServiceName)} Shutdown");
 
             _signalR?.Dispose();
             _guaranteedDeliveryThreadDelegate.RegisterThreadShutdown();
+            _guaranteedDeliveryBackupThreadDelegate.RegisterThreadShutdown();
             var inc = 0;
-            while (_guaranteedDeliveryThreadDelegate.IsRunning && inc < 40)
+            while ((_guaranteedDeliveryThreadDelegate.IsRunning || _guaranteedDeliveryBackupThreadDelegate.IsRunning) && inc < 40)
             {
-                logger.PushInfo("Pausing 250 ms waiting for Quaranteed Delivery Thread to shutdown...");
+                numMs += 250;
                 Thread.Sleep(250);
                 inc++;
             }
 
             // Waited max of 10 seconds and it is still running
-            if (inc == 40 && _guaranteedDeliveryThreadDelegate.IsRunning)
+            if (inc == 40 && (_guaranteedDeliveryThreadDelegate.IsRunning || _guaranteedDeliveryBackupThreadDelegate.IsRunning))
             {
-                logger.PushError("Quaranteed Delivery Thread did not shut down in 10 seconds.");
+                logger.PushError("Guaranteed Delivery Thread(s) did not shut down in 10 seconds.");
                 logger.LogExecutionCompleteAsError(failedItemCount: 0);
             }
             else
             {
+                logger.PushInfo($"Guaranteed Delivery Thread(s) shut down in {numMs} milliseconds.");
                 logger.LogExecutionComplete(0);
             }
         }

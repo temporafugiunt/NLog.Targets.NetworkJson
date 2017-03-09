@@ -5,7 +5,7 @@ using System.Threading;
 using GDNetworkJSONService.LocalLogStorageDB;
 using NLog.Targets.NetworkJSON;
 
-namespace GDNetworkJSONService.GuaranteedDelivery
+namespace GDNetworkJSONService.ServiceThreads
 {
     internal class GuaranteedDeliveryThreadDelegate
     {
@@ -14,7 +14,7 @@ namespace GDNetworkJSONService.GuaranteedDelivery
         public bool IsRunning { get; private set; } = true;
 
         public bool IsAppShuttingDown { get; private set; } = false;
-
+        
         #endregion
 
         public void RegisterThreadShutdown()
@@ -31,6 +31,7 @@ namespace GDNetworkJSONService.GuaranteedDelivery
     internal class GuaranteedDeliveryThread
     {
         public static int TotalMessageCount;
+        public static int TotalFailedCount;
 
         public static void ThreadMethod(GuaranteedDeliveryThreadDelegate threadData)
         {
@@ -45,7 +46,7 @@ namespace GDNetworkJSONService.GuaranteedDelivery
                         dbConnection = LogStorageDbGlobals.OpenNewConnection();
                     }
 
-                    var logMessages = LogStorageTable.GetNextTenRecords(dbConnection);
+                    var logMessages = LogStorageTable.GetFirstTryRecords(dbConnection);
                     if (logMessages.Rows.Count == 0)
                     {
                         Thread.Sleep(500);
@@ -54,7 +55,7 @@ namespace GDNetworkJSONService.GuaranteedDelivery
                     {
                         for (var inc = 0; inc < logMessages.Rows.Count; inc++)
                         {
-                            var messageId = logMessages.Rows[inc][LogStorageTable.Columns.MessageId.Index].ToString();
+                            var messageId = (int)logMessages.Rows[inc][LogStorageTable.Columns.MessageId.Index];
                             var endpoint = logMessages.Rows[inc][LogStorageTable.Columns.Endpoint.Index].ToString();
                             var logMessage = logMessages.Rows[inc][LogStorageTable.Columns.LogMessage.Index].ToString();
                             NetworkJsonTarget currentTarget = null;
@@ -63,15 +64,29 @@ namespace GDNetworkJSONService.GuaranteedDelivery
                                 currentTarget = new NetworkJsonTarget {Endpoint = endpoint};
                                 targets.Add(endpoint, currentTarget);
                             }
-                            currentTarget.Write(logMessage);
-                            LogStorageTable.DeleteProcessedRecord(dbConnection, messageId);
-                            Interlocked.Increment(ref TotalMessageCount);
-                            Console.WriteLine($"OUT={TotalMessageCount}");
+                            try
+                            {
+                                currentTarget.Write(logMessage);
+                                LogStorageTable.DeleteProcessedRecord(dbConnection, messageId);
+                                Interlocked.Increment(ref TotalMessageCount);
+                                Console.WriteLine($"OUT={TotalMessageCount}");
+                            }
+                            catch (Exception ex)
+                            {
+                                // TODO: Log failure?
+                                // Fail the message, backup thread will take over for this message until dead letter time.
+                                LogStorageTable.UpdateLogRecord(dbConnection, messageId, 1);
+                                targets.Remove(endpoint);
+                                Interlocked.Increment(ref TotalFailedCount);
+                                Console.WriteLine($"FAILED={TotalFailedCount}");
+                                Thread.Sleep(1000);
+                            }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
+                    // TODO: Log failure?
                     dbConnection?.Close();
                     dbConnection = null;
                     targets.Clear();

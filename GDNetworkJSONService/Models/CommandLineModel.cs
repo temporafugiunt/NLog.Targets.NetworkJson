@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Configuration;
+using GDNetworkJSONService.LocalLogStorageDB;
 using NLog.Targets.NetworkJSON.ExtensionMethods;
 
 namespace GDNetworkJSONService.Models
@@ -22,7 +23,8 @@ namespace GDNetworkJSONService.Models
                         @"and provides the 'store and forward' capability of the NLog.Targets.NetworkJSON",
                         @"NLog Target.",
                         @" ",
-                        $"{AppBinaryName} /CONSOLE [/ENDPOINT=http[s]://localhost:portnumber]",
+                        $"{AppBinaryName} /CONSOLE [/ENDPOINT=http://localhost:portnumber] [/DBSELECTCOUNT=X]",
+                        $"     [/MTDL=X]",
                         @" ",
                         @"  /CONSOLE                  Run this app in console mode, if this is NOT SET then",
                         @"                            the application will attempt to start as a service.",
@@ -30,7 +32,11 @@ namespace GDNetworkJSONService.Models
                         @"                            programs. If not set then the default is retrieved from",
                         @"                            the application configuration file.",
                         @"  /DBSELECTCOUNT            The number of log messages to read from the Log Storage DB",
-                        @"                            in a single SELECT statement.",
+                        $"                            in a single SELECT statement. Default is {LogStorageDbGlobals.DbReadCountDefault}.",
+                        @"  /MTDL                     The number of minutes on SUBSEQUENT retries of attempting to",
+                        @"                            send a log message before it is considered a 'Dead Letter'",
+                        $"                            and is moved to the {DeadLetterLogStorageTable.TableName} table.",
+                        $"                            Default is {LogStorageDbGlobals.MinutesTillDeadLetterDefault} minutes.",
                         @"  /?                        Display this help information.",
                         @" "
                     };
@@ -98,11 +104,28 @@ namespace GDNetworkJSONService.Models
                     }
                 }
             }
+            if (MinutesToDeadLetter < 1)
+            {
+                var tempMtdl = ConfigurationManager.AppSettings["MinutesToDeadLetter"];
+                if (!tempMtdl.IsNullOrEmpty())
+                {
+                    var tempMtdlInt = -1;
+                    if (int.TryParse(tempMtdl, out tempMtdlInt))
+                    {
+                        MinutesToDeadLetter = tempMtdlInt;
+                    }
+                }
+            }
 
-            // Just default this if not found or if it was invalid in app config.
+            // Just default these if not found or if it was invalid in app config.
             if (DbReadCount < 1)
             {
-                DbReadCount = 10;
+                DbReadCount = LogStorageDbGlobals.DbReadCountDefault;
+            }
+
+            if (MinutesToDeadLetter < 1)
+            {
+                MinutesToDeadLetter = LogStorageDbGlobals.MinutesTillDeadLetterDefault;
             }
 
             if (ErrorInfo.Count > 0)
@@ -128,13 +151,27 @@ namespace GDNetworkJSONService.Models
                 var arg = commandLineEntry.Split('=');
                 var dbReadCount = -1;
 
-                if ((arg.Length == 2) && int.TryParse(arg[1], out dbReadCount) && DbReadCount > 0)
+                if ((arg.Length == 2) && int.TryParse(arg[1], out dbReadCount) && dbReadCount > 0)
                 {
                     DbReadCount = dbReadCount;
                 }
                 else
                 {
                     ErrorInfo.Add("Invalid DBSELECTCOUNT parameter");
+                }
+            }
+            if (commandLineEntry.StartsWithCommandLineArg("mtdl"))
+            {
+                var arg = commandLineEntry.Split('=');
+                var mtdl = -1;
+
+                if ((arg.Length == 2) && int.TryParse(arg[1], out mtdl) && mtdl > 0)
+                {
+                    MinutesToDeadLetter = mtdl;
+                }
+                else
+                {
+                    ErrorInfo.Add("Invalid MTDL parameter");
                 }
             }
         }
@@ -178,24 +215,24 @@ namespace GDNetworkJSONService.Models
         {
             get
             {
-                return LocalLogStorageDB.LogStorageDbGlobals.ConnectionString;
+                return LogStorageDbGlobals.ConnectionString;
             }
             set
             {
                 if (value.IsNullOrEmpty())
                 {
-                    LocalLogStorageDB.LogStorageDbGlobals.ConnectionString = "";
+                    LogStorageDbGlobals.ConnectionString = "";
                     return;
                 }
                 if(value.Length > 3 && (value.StartsWith("\"") || value.StartsWith("'")))
                 {
-                    LocalLogStorageDB.LogStorageDbGlobals.ConnectionString = value.Substring(0, value.Length - 2);
+                    LogStorageDbGlobals.ConnectionString = value.Substring(0, value.Length - 2);
                 }
                 else
                 {
-                    LocalLogStorageDB.LogStorageDbGlobals.ConnectionString = value;
+                    LogStorageDbGlobals.ConnectionString = value;
                 }
-                ParameterInfo.Add($"Log Log Storage Connection String = {LocalLogStorageDB.LogStorageDbGlobals.ConnectionString}");
+                ParameterInfo.Add($"Log Log Storage Connection String = {LogStorageDbGlobals.ConnectionString}");
             }
         }
 
@@ -203,7 +240,7 @@ namespace GDNetworkJSONService.Models
         {
             get
             {
-                return LocalLogStorageDB.LogStorageDbGlobals.DbReadCount;
+                return LogStorageDbGlobals.DbReadCount;
             }
             set
             {
@@ -211,8 +248,25 @@ namespace GDNetworkJSONService.Models
                 {
                     return;
                 }
-                LocalLogStorageDB.LogStorageDbGlobals.DbReadCount = value;
-                ParameterInfo.Add($"DB Read Count = {LocalLogStorageDB.LogStorageDbGlobals.DbReadCount}");
+                LogStorageDbGlobals.DbReadCount = value;
+                ParameterInfo.Add($"DB Read Count = {LogStorageDbGlobals.DbReadCount}");
+            }
+        }
+
+        public int MinutesToDeadLetter
+        {
+            get
+            {
+                return LogStorageDbGlobals.MinutesTillDeadLetter;
+            }
+            set
+            {
+                if (value < 1)
+                {
+                    return;
+                }
+                LogStorageDbGlobals.MinutesTillDeadLetter = value;
+                ParameterInfo.Add($"Minutes Till Dead Letter = {LogStorageDbGlobals.MinutesTillDeadLetter}");
             }
         }
 
