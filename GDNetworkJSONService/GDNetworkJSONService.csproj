@@ -118,7 +118,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExtensionMethods\ServiceExtensions.cs" />
+    <Compile Include="Helpers\AppSettingsHelper.cs" />
     <Compile Include="LocalLogStorageDB\DeadLetterLogStorageTable.cs" />
+    <Compile Include="Loggers\DiagnosticsInstrumentationLogger.cs" />
     <Compile Include="ServiceThreads\GuaranteedDeliveryBackupThread.cs" />
     <Compile Include="ServiceThreads\GuaranteedDeliveryThread.cs" />
     <Compile Include="LocalLogStorageDB\ColumnInfo.cs" />

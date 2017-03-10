@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Configuration;
+using GDNetworkJSONService.Helpers;
 using GDNetworkJSONService.LocalLogStorageDB;
 using NLog.Targets.NetworkJSON.ExtensionMethods;
 
@@ -32,11 +33,10 @@ namespace GDNetworkJSONService.Models
                         @"                            programs. If not set then the default is retrieved from",
                         @"                            the application configuration file.",
                         @"  /DBSELECTCOUNT            The number of log messages to read from the Log Storage DB",
-                        $"                            in a single SELECT statement. Default is {LogStorageDbGlobals.DbReadCountDefault}.",
+                        $"                            in a single SELECT statement.",
                         @"  /MTDL                     The number of minutes on SUBSEQUENT retries of attempting to",
                         @"                            send a log message before it is considered a 'Dead Letter'",
                         $"                            and is moved to the {DeadLetterLogStorageTable.TableName} table.",
-                        $"                            Default is {LogStorageDbGlobals.MinutesTillDeadLetterDefault} minutes.",
                         @"  /?                        Display this help information.",
                         @" "
                     };
@@ -92,42 +92,15 @@ namespace GDNetworkJSONService.Models
                     ErrorInfo.Add("LocalLogStorage is not properly setup in the application configuration and was not passed at the command line.");
                 }
             }
-            if (DbReadCount < 1)
+            if (DbSelectCount < 1)
             {
-                var tempDbReadCount = ConfigurationManager.AppSettings["DBSelectCount"];
-                if (!tempDbReadCount.IsNullOrEmpty())
-                {
-                    var tempDbReadCountInt = -1;
-                    if (int.TryParse(tempDbReadCount, out tempDbReadCountInt))
-                    {
-                        DbReadCount = tempDbReadCountInt;
-                    }
-                }
+                DbSelectCount = AppSettingsHelper.DbSelectCount;
             }
             if (MinutesToDeadLetter < 1)
             {
-                var tempMtdl = ConfigurationManager.AppSettings["MinutesToDeadLetter"];
-                if (!tempMtdl.IsNullOrEmpty())
-                {
-                    var tempMtdlInt = -1;
-                    if (int.TryParse(tempMtdl, out tempMtdlInt))
-                    {
-                        MinutesToDeadLetter = tempMtdlInt;
-                    }
-                }
+                MinutesToDeadLetter = AppSettingsHelper.MinutesToDeadLetter;
             }
-
-            // Just default these if not found or if it was invalid in app config.
-            if (DbReadCount < 1)
-            {
-                DbReadCount = LogStorageDbGlobals.DbReadCountDefault;
-            }
-
-            if (MinutesToDeadLetter < 1)
-            {
-                MinutesToDeadLetter = LogStorageDbGlobals.MinutesTillDeadLetterDefault;
-            }
-
+            
             if (ErrorInfo.Count > 0)
             {
                 parameterStatus = ParseCommandLineStatus.DisplayError;
@@ -153,7 +126,7 @@ namespace GDNetworkJSONService.Models
 
                 if ((arg.Length == 2) && int.TryParse(arg[1], out dbReadCount) && dbReadCount > 0)
                 {
-                    DbReadCount = dbReadCount;
+                    DbSelectCount = dbReadCount;
                 }
                 else
                 {
@@ -236,11 +209,11 @@ namespace GDNetworkJSONService.Models
             }
         }
 
-        public int DbReadCount
+        public int DbSelectCount
         {
             get
             {
-                return LogStorageDbGlobals.DbReadCount;
+                return LogStorageDbGlobals.DbSelectCount;
             }
             set
             {
@@ -248,8 +221,8 @@ namespace GDNetworkJSONService.Models
                 {
                     return;
                 }
-                LogStorageDbGlobals.DbReadCount = value;
-                ParameterInfo.Add($"DB Read Count = {LogStorageDbGlobals.DbReadCount}");
+                LogStorageDbGlobals.DbSelectCount = value;
+                ParameterInfo.Add($"DB Read Count = {LogStorageDbGlobals.DbSelectCount}");
             }
         }
 

@@ -9,7 +9,7 @@ namespace GDNetworkJSONService.ServiceThreads
 {
     internal class GuaranteedDeliveryBackupThread
     {
-        public static int TotalMessageCount;
+        public static int TotalSuccessCount;
         public static int TotalFailedCount;
 
         public static void ThreadMethod(GuaranteedDeliveryThreadDelegate threadData)
@@ -28,16 +28,16 @@ namespace GDNetworkJSONService.ServiceThreads
                     var logMessages = LogStorageTable.GetRetryRecords(dbConnection);
                     if (logMessages.Rows.Count == 0)
                     {
-                        Thread.Sleep(500);
+                        Thread.Sleep(60000);
                     }
                     else
                     {
                         for (var inc = 0; inc < logMessages.Rows.Count; inc++)
                         {
-                            var messageId = (int)logMessages.Rows[inc][LogStorageTable.Columns.MessageId.Index];
+                            var messageId = (long)logMessages.Rows[inc][LogStorageTable.Columns.MessageId.Index];
                             var endpoint = logMessages.Rows[inc][LogStorageTable.Columns.Endpoint.Index].ToString();
                             var logMessage = logMessages.Rows[inc][LogStorageTable.Columns.LogMessage.Index].ToString();
-                            var retryCount = (int)logMessages.Rows[inc][LogStorageTable.Columns.RetryCount.Index];
+                            var retryCount = (long)logMessages.Rows[inc][LogStorageTable.Columns.RetryCount.Index];
                             var createdOn = (DateTime) logMessages.Rows[inc][LogStorageTable.Columns.CreatedOn.Index];
                             NetworkJsonTarget currentTarget = null;
                             if (!targets.TryGetValue(endpoint, out currentTarget))
@@ -50,8 +50,7 @@ namespace GDNetworkJSONService.ServiceThreads
                                 retryCount++;
                                 currentTarget.Write(logMessage);
                                 LogStorageTable.DeleteProcessedRecord(dbConnection, messageId);
-                                Interlocked.Increment(ref TotalMessageCount);
-                                Console.WriteLine($"B-OUT={TotalMessageCount}");
+                                Interlocked.Increment(ref TotalSuccessCount);
                             }
                             catch (Exception ex)
                             {
@@ -65,26 +64,22 @@ namespace GDNetworkJSONService.ServiceThreads
                                 {
                                     LogStorageTable.UpdateLogRecord(dbConnection, messageId, retryCount);
                                 }
-                                // TODO: Log failure?
                                 targets.Remove(endpoint);
                                 Interlocked.Increment(ref TotalFailedCount);
-                                Console.WriteLine($"B-FAILED={TotalFailedCount}");
-                                Thread.Sleep(1000);
+                                Thread.Sleep(2000);
                             }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    // TODO: Log failure?
                     dbConnection?.Close();
                     dbConnection = null;
                     targets.Clear();
-                    Thread.Sleep(1000);
+                    Thread.Sleep(60000);
                 }
                 
             }
-            Console.WriteLine("Background Thread Shutdown");
             threadData.ThreadHasShutdown();
         }
     }

@@ -6,14 +6,9 @@ namespace GDNetworkJSONService.LocalLogStorageDB
     {
         public static string ConnectionString { get; set; }
 
-        public static int DbReadCount { get; set; }
-
-        public const int DbReadCountDefault = 10;
+        public static int DbSelectCount { get; set; }
 
         public static int MinutesTillDeadLetter { get; set; }
-
-        // 4 days is default.
-        public const int MinutesTillDeadLetterDefault = 5760;
 
         //public static int MaxLockTrys { get; set; } = 5;
 

@@ -45,7 +45,7 @@ namespace GDNetworkJSONService.LocalLogStorageDB
 
         public static int InsertLogRecord(SQLiteConnection dbConnection, string endpoint, string logMessage)
         {
-            var dataInsertSql = $"INSERT INTO {TableName} ({Columns.Endpoint.ColumnName}, {Columns.LogMessage.ColumnName}) VALUES ({Columns.Endpoint.ParameterName}, {Columns.LogMessage.ParameterName})";
+            var dataInsertSql = $"INSERT INTO {TableName} ({Columns.Endpoint.ColumnName}, {Columns.LogMessage.ColumnName}, {Columns.RetryCount.ColumnName}, {Columns.CreatedOn.ColumnName}) VALUES ({Columns.Endpoint.ParameterName}, {Columns.LogMessage.ParameterName}, {Columns.RetryCount.ParameterName}, {Columns.CreatedOn.ParameterName})";
             var cmd = new SQLiteCommand(dataInsertSql, dbConnection);
 
             var param = Columns.Endpoint.GetParamterForColumn();
@@ -56,12 +56,12 @@ namespace GDNetworkJSONService.LocalLogStorageDB
             param.Value = logMessage;
             cmd.Parameters.Add(param);
 
-            param = Columns.CreatedOn.GetParamterForColumn();
-            param.Value = DateTime.Now;
-            cmd.Parameters.Add(param);
-
             param = Columns.RetryCount.GetParamterForColumn();
             param.Value = 0;
+            cmd.Parameters.Add(param);
+
+            param = Columns.CreatedOn.GetParamterForColumn();
+            param.Value = DateTime.Now;
             cmd.Parameters.Add(param);
 
             return cmd.ExecuteNonQuery();
@@ -69,7 +69,7 @@ namespace GDNetworkJSONService.LocalLogStorageDB
 
         public static DataTable GetFirstTryRecords(SQLiteConnection dbConnection)
         {
-            var dataSelectSql = $"SELECT * FROM {TableName} WHERE {Columns.RetryCount.ColumnName} = 0 LIMIT {LogStorageDbGlobals.DbReadCount}";
+            var dataSelectSql = $"SELECT * FROM {TableName} WHERE {Columns.RetryCount.ColumnName} = 0 LIMIT {LogStorageDbGlobals.DbSelectCount}";
             var cmd = new SQLiteCommand(dataSelectSql, dbConnection);
             var dt = new DataTable(TableName);
             var reader = cmd.ExecuteReader();
@@ -79,7 +79,7 @@ namespace GDNetworkJSONService.LocalLogStorageDB
 
         public static DataTable GetRetryRecords(SQLiteConnection dbConnection)
         {
-            var dataSelectSql = $"SELECT * FROM {TableName} WHERE {Columns.RetryCount.ColumnName} > 0 ORDER BY RetryCount ASC, MessageId ASC LIMIT {LogStorageDbGlobals.DbReadCount}";
+            var dataSelectSql = $"SELECT * FROM {TableName} WHERE {Columns.RetryCount.ColumnName} > 0 ORDER BY RetryCount ASC, MessageId ASC LIMIT {LogStorageDbGlobals.DbSelectCount}";
             var cmd = new SQLiteCommand(dataSelectSql, dbConnection);
             var dt = new DataTable(TableName);
             var reader = cmd.ExecuteReader();
@@ -87,7 +87,7 @@ namespace GDNetworkJSONService.LocalLogStorageDB
             return dt;
         }
 
-        public static int UpdateLogRecord(SQLiteConnection dbConnection, int messageId, int retryCount)
+        public static int UpdateLogRecord(SQLiteConnection dbConnection, long messageId, long retryCount)
         {
             var dataInsertSql = $"UPDATE {TableName} SET {Columns.RetryCount.ColumnName} = {retryCount} WHERE {Columns.MessageId.ColumnName} = {messageId}";
             var cmd = new SQLiteCommand(dataInsertSql, dbConnection);
@@ -95,11 +95,19 @@ namespace GDNetworkJSONService.LocalLogStorageDB
             return cmd.ExecuteNonQuery();
         }
 
-        public static int DeleteProcessedRecord(SQLiteConnection dbConnection, int messageId)
+        public static int DeleteProcessedRecord(SQLiteConnection dbConnection, long messageId)
         {
             var dataInsertSql = $"DELETE FROM {TableName} WHERE {Columns.MessageId.ColumnName} = {messageId}";
             var cmd = new SQLiteCommand(dataInsertSql, dbConnection);
             return cmd.ExecuteNonQuery();
+        }
+
+        public static long GetBacklogCount(SQLiteConnection dbConnection)
+        {
+            var dataSelectSql = $"SELECT COUNT(*) FROM {TableName}";
+            var cmd = new SQLiteCommand(dataSelectSql, dbConnection);
+
+            return (long)cmd.ExecuteScalar();
         }
     }
 }

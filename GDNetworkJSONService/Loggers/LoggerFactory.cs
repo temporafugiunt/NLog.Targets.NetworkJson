@@ -7,6 +7,11 @@ namespace GDNetworkJSONService.Loggers
     {
         private const string ApplicationLoggingId = "pv-supportapp-networkjsonrs";
 
+        public static DiagnosticsInstrumentationLogger GetDiagnosticsInstrumentationLogger()
+        {
+            return new DiagnosticsInstrumentationLogger(Assembly.GetExecutingAssembly(), ApplicationLoggingId);
+        }
+
         public static InstrumentationLogger GetInstrumentationLogger()
         {
             return new InstrumentationLogger(Assembly.GetExecutingAssembly(), ApplicationLoggingId);

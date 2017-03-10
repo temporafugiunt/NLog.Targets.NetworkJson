@@ -11,9 +11,9 @@ namespace GDNetworkJSONService.ServiceThreads
     {
         #region Public Properties
 
-        public bool IsRunning { get; private set; } = true;
+        public bool IsRunning { get; private set; }
 
-        public bool IsAppShuttingDown { get; private set; } = false;
+        public bool IsAppShuttingDown { get; private set; }
         
         #endregion
 
@@ -30,7 +30,7 @@ namespace GDNetworkJSONService.ServiceThreads
 
     internal class GuaranteedDeliveryThread
     {
-        public static int TotalMessageCount;
+        public static int TotalSuccessCount;
         public static int TotalFailedCount;
 
         public static void ThreadMethod(GuaranteedDeliveryThreadDelegate threadData)
@@ -55,7 +55,7 @@ namespace GDNetworkJSONService.ServiceThreads
                     {
                         for (var inc = 0; inc < logMessages.Rows.Count; inc++)
                         {
-                            var messageId = (int)logMessages.Rows[inc][LogStorageTable.Columns.MessageId.Index];
+                            var messageId = (long)logMessages.Rows[inc][LogStorageTable.Columns.MessageId.Index];
                             var endpoint = logMessages.Rows[inc][LogStorageTable.Columns.Endpoint.Index].ToString();
                             var logMessage = logMessages.Rows[inc][LogStorageTable.Columns.LogMessage.Index].ToString();
                             NetworkJsonTarget currentTarget = null;
@@ -68,33 +68,27 @@ namespace GDNetworkJSONService.ServiceThreads
                             {
                                 currentTarget.Write(logMessage);
                                 LogStorageTable.DeleteProcessedRecord(dbConnection, messageId);
-                                Interlocked.Increment(ref TotalMessageCount);
-                                Console.WriteLine($"OUT={TotalMessageCount}");
+                                Interlocked.Increment(ref TotalSuccessCount);
                             }
                             catch (Exception ex)
                             {
-                                // TODO: Log failure?
                                 // Fail the message, backup thread will take over for this message until dead letter time.
                                 LogStorageTable.UpdateLogRecord(dbConnection, messageId, 1);
                                 targets.Remove(endpoint);
                                 Interlocked.Increment(ref TotalFailedCount);
-                                Console.WriteLine($"FAILED={TotalFailedCount}");
-                                Thread.Sleep(1000);
+                                Thread.Sleep(500);
                             }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    // TODO: Log failure?
                     dbConnection?.Close();
                     dbConnection = null;
                     targets.Clear();
                     Thread.Sleep(1000);
                 }
-                
             }
-            Console.WriteLine("Background Thread Shutdown");
             threadData.ThreadHasShutdown();
         }
     }

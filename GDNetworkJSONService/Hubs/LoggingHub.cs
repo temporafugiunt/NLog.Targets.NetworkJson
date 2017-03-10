@@ -14,7 +14,6 @@ namespace GDNetworkJSONService.Hubs
         public void StoreAndForward(string forwardEndpoint, string jsonMessage)
         {
             Interlocked.Increment(ref TotalMessageCount);
-            Console.WriteLine($"IN={TotalMessageCount}");
             LocalLogStorageDB.LogStorageTable.InsertLogRecord(forwardEndpoint, jsonMessage);
         }
     }

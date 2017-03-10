@@ -33,9 +33,9 @@ namespace GDNetworkJSONService.LocalLogStorageDB
             cmd.ExecuteNonQuery();
         }
 
-        public static int InsertLogRecord(SQLiteConnection dbConnection, string endpoint, string logMessage, DateTime createdOn, int retryCount)
+        public static int InsertLogRecord(SQLiteConnection dbConnection, string endpoint, string logMessage, DateTime createdOn, long retryCount)
         {
-            var dataInsertSql = $"INSERT INTO {TableName} ({Columns.Endpoint.ColumnName}, {Columns.LogMessage.ColumnName}, {Columns.CreatedOn.ColumnName}, {Columns.RetryCount.ColumnName}, {Columns.ArchivedOn}) VALUES ({Columns.Endpoint.ParameterName}, {Columns.LogMessage.ParameterName}, {Columns.CreatedOn.ParameterName}, {Columns.RetryCount.ParameterName}, {Columns.ArchivedOn.ParameterName})";
+            var dataInsertSql = $"INSERT INTO {TableName} ({Columns.Endpoint.ColumnName}, {Columns.LogMessage.ColumnName}, {Columns.CreatedOn.ColumnName}, {Columns.RetryCount.ColumnName}, {Columns.ArchivedOn.ColumnName}) VALUES ({Columns.Endpoint.ParameterName}, {Columns.LogMessage.ParameterName}, {Columns.CreatedOn.ParameterName}, {Columns.RetryCount.ParameterName}, {Columns.ArchivedOn.ParameterName})";
             var cmd = new SQLiteCommand(dataInsertSql, dbConnection);
 
             var param = Columns.Endpoint.GetParamterForColumn();
@@ -61,12 +61,12 @@ namespace GDNetworkJSONService.LocalLogStorageDB
             return cmd.ExecuteNonQuery();
         }
 
-        public static int GetDeadLetterCount(SQLiteConnection dbConnection)
+        public static long GetDeadLetterCount(SQLiteConnection dbConnection)
         {
             var dataSelectSql = $"SELECT COUNT(*) FROM {TableName}";
             var cmd = new SQLiteCommand(dataSelectSql, dbConnection);
             
-            return (int)cmd.ExecuteScalar();
+            return (long)cmd.ExecuteScalar();
         }
     }
 }
