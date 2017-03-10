@@ -41,7 +41,7 @@
     <!-- Build Release version and publish to the repository. --> 
     <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Release;Platform=Any CPU" Targets="Clean;Build" />
   
-    <PushToRepository ApplicationName="$(ApplicationName1)" ApplicationVersion="$(ApplicationVersion)" PushToDirectory="Release" SourceDirectoryOrFile="$(SolutionDirectory)\PVWorkLists\bin\Release" BaseRepositoryLocation="$(BASE_REPO_HOME)" Verbose="$(VERBOSE)" />
+    <PushToRepository ApplicationName="$(ApplicationName1)" ApplicationVersion="$(ApplicationVersion)" PushToDirectory="Release" SourceDirectoryOrFile="$(SolutionDirectory)\Target\bin\Release" BaseRepositoryLocation="$(BASE_REPO_HOME)" Verbose="$(VERBOSE)" />
     
     <PushToRepository ApplicationName="$(ApplicationName2)" ApplicationVersion="$(ApplicationVersion)" PushToDirectory="Release" SourceDirectoryOrFile="$(SolutionDirectory)\GDNetworkJSONService\bin\Debug" BaseRepositoryLocation="$(BASE_REPO_HOME)" Verbose="$(VERBOSE)" />
     
