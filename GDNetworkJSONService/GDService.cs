@@ -47,7 +47,7 @@ namespace GDNetworkJSONService
 
         protected override void OnStart(string[] args)
         {
-            var instrumentationlogger = LoggerFactory.GetInstrumentationLogger(false);
+            var instrumentationlogger = LoggerFactory.GetInstrumentationLogger();
             instrumentationlogger.InitializeExecutionLogging($"{this.GetRealServiceName(ServiceName)} Startup");
 
             try
@@ -115,7 +115,7 @@ namespace GDNetworkJSONService
 
         private void SetupDiagnosticsSchedule()
         {
-            var messageLogger = LoggerFactory.GetMessageLogger(false);
+            var messageLogger = LoggerFactory.GetMessageLogger();
             try
             {
                 if (!_isRunning) return;

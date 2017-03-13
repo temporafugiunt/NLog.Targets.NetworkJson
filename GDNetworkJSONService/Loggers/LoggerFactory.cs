@@ -5,45 +5,26 @@ namespace GDNetworkJSONService.Loggers
 {
     internal class LoggerFactory
     {
-        private const string ApplicationLoggingIdNonGD = "pv-supportapp-gdservicenetworkjsonnogd";
         private const string ApplicationLoggingId = "pv-supportapp-gdservicenetworkjson";
 
-        public static DiagnosticsInstrumentationLogger GetDiagnosticsInstrumentationLogger(bool useGuaranteedDelivery = true)
+        public static DiagnosticsInstrumentationLogger GetDiagnosticsInstrumentationLogger()
         {
-            if (useGuaranteedDelivery)
-            {
-                return new DiagnosticsInstrumentationLogger(Assembly.GetExecutingAssembly(), ApplicationLoggingId);
-            }
-            return new DiagnosticsInstrumentationLogger(Assembly.GetExecutingAssembly(), ApplicationLoggingIdNonGD);
+            return new DiagnosticsInstrumentationLogger(Assembly.GetExecutingAssembly(), ApplicationLoggingId);
         }
 
-        public static InstrumentationLogger GetInstrumentationLogger(bool useGuaranteedDelivery = true)
+        public static InstrumentationLogger GetInstrumentationLogger()
         {
-            useGuaranteedDelivery = true;
-            if (useGuaranteedDelivery)
-            {
-                return new InstrumentationLogger(Assembly.GetExecutingAssembly(), ApplicationLoggingId);
-            }
-            return new InstrumentationLogger(Assembly.GetExecutingAssembly(), ApplicationLoggingIdNonGD);
+            return new InstrumentationLogger(Assembly.GetExecutingAssembly(), ApplicationLoggingId);
         }
 
-        public static MessageLogger GetMessageLogger(bool useGuaranteedDelivery = true)
+        public static MessageLogger GetMessageLogger()
         {
-            useGuaranteedDelivery = true;
-            if (useGuaranteedDelivery)
-            {
-                return new MessageLogger(Assembly.GetExecutingAssembly(), LogMessageTypes.LogMessage.ToString(), ApplicationLoggingId);
-            }
-            return new MessageLogger(Assembly.GetExecutingAssembly(), LogMessageTypes.LogMessage.ToString(), ApplicationLoggingIdNonGD);
+            return new MessageLogger(Assembly.GetExecutingAssembly(), LogMessageTypes.LogMessage.ToString(), ApplicationLoggingId);
         }
 
         public static BasicConfigLogger GetConfigLogger(bool useGuaranteedDelivery = true)
         {
-            if (useGuaranteedDelivery)
-            {
-                return new BasicConfigLogger(Assembly.GetExecutingAssembly(), ApplicationLoggingId);
-            }
-            return new BasicConfigLogger(Assembly.GetExecutingAssembly(), ApplicationLoggingIdNonGD);
+            return new BasicConfigLogger(Assembly.GetExecutingAssembly(), ApplicationLoggingId);
         }
     }
 }

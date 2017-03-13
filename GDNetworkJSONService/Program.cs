@@ -9,7 +9,7 @@ namespace GDNetworkJSONService
 {
     class Program
     {
-        private static MessageLogger Logger { get; } = LoggerFactory.GetMessageLogger(false);
+        private static MessageLogger Logger { get; } = LoggerFactory.GetMessageLogger();
 
         static void Main(string[] args)
         {
