@@ -5,7 +5,7 @@ namespace GDNetworkJSONService.Loggers
 {
     internal class LoggerFactory
     {
-        private const string ApplicationLoggingId = "pv-supportapp-gdservicenetworkjson";
+        private const string ApplicationLoggingId = "pv-supportapp-gdnetworkjsonservice";
 
         public static DiagnosticsInstrumentationLogger GetDiagnosticsInstrumentationLogger()
         {

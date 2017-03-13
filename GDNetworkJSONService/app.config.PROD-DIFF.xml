@@ -1,3 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <configuration>
+  <appSettings>
+    <!-- 4 days till dead letter in PROD -->
+    <add key="MinutesToDeadLetter" value="5760" />
+    <add key="DiagnosticsScheduleMode" value="INTERVAL" />
+    <add key="DiagnosticsScheduleTime" value="" />
+    <add key="DiagnosticsIntervalSeconds" value="60"/>
+    <add key="SkipZeroDiagnostics" value="true"/>
+  </appSettings>
 </configuration>
