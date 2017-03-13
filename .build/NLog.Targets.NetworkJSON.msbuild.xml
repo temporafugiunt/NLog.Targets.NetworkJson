@@ -3,7 +3,7 @@
   <PropertyGroup>
     <SolutionDirectory>$(WORKSPACE)</SolutionDirectory>
     <SolutionFile>$(SolutionDirectory)\NLog.Targets.NetworkJSON.sln</SolutionFile>
-    <ApplicationName1>NLog.Targets.NetworkJSON</ApplicationName1>
+    <ApplicationName>NLog.Targets.NetworkJSON</ApplicationName>
     <ApplicationName2>Guaranteed Delivery NetworkJSON Service</ApplicationName2>
     <IncludeBinariesInSourceZip>false</IncludeBinariesInSourceZip>
     <MainlineVersionOverride>16.0</MainlineVersionOverride>
@@ -23,7 +23,7 @@
       <Output TaskParameter="ApplicationVersion" PropertyName="ApplicationVersion" />
     </DefineAppVersion>
     <Exec Command="CopyLibsFromOfficial.Release.bat &quot;$(BASE_REPO_HOME)&quot;" WorkingDirectory="$(SolutionDirectory)" />
-    <SetVersionInfoFile SolutionType="cs" SolutionDirectory="$(SolutionDirectory)" AssemblySubdirectory="Target" Company="$(COMPANY)" ApplicationName="$(ApplicationName1)" ApplicationVersion="$(ApplicationVersion)" Verbose="$(VERBOSE)" />
+    <SetVersionInfoFile SolutionType="cs" SolutionDirectory="$(SolutionDirectory)" AssemblySubdirectory="Target" Company="$(COMPANY)" ApplicationName="$(ApplicationName)" ApplicationVersion="$(ApplicationVersion)" Verbose="$(VERBOSE)" />
     
     <SetVersionInfoFile SolutionType="cs" SolutionDirectory="$(SolutionDirectory)" AssemblySubdirectory="GDNetworkJSONService" Company="$(COMPANY)" ApplicationName="$(ApplicationName2)" ApplicationVersion="$(ApplicationVersion)" Verbose="$(VERBOSE)" />
 
@@ -32,7 +32,7 @@
     <NUnit Assemblies="$(SolutionDirectory)\Tests\bin\Debug\NLog.Targets.NetworkJSON.Tests.dll" ToolPath="$(NUNIT_HOME)" />
     
 	  <!-- Push applications -->
-	  <PushToRepository ApplicationName="$(ApplicationName1)" ApplicationVersion="$(ApplicationVersion)" PushToDirectory="Debug" SourceDirectoryOrFile="$(SolutionDirectory)\Target\bin\Debug" BaseRepositoryLocation="$(BASE_REPO_HOME)" Verbose="$(VERBOSE)" />
+	  <PushToRepository ApplicationName="$(ApplicationName)" ApplicationVersion="$(ApplicationVersion)" PushToDirectory="Debug" SourceDirectoryOrFile="$(SolutionDirectory)\Target\bin\Debug" BaseRepositoryLocation="$(BASE_REPO_HOME)" Verbose="$(VERBOSE)" />
     
     <PushToRepository ApplicationName="$(ApplicationName2)" ApplicationVersion="$(ApplicationVersion)" PushToDirectory="Debug" SourceDirectoryOrFile="$(SolutionDirectory)\GDNetworkJSONService\bin\Debug" BaseRepositoryLocation="$(BASE_REPO_HOME)" Verbose="$(VERBOSE)">
       <Output TaskParameter="RepositoryInfo" ItemName="RepositoryInfo" />
@@ -41,7 +41,7 @@
     <!-- Build Release version and publish to the repository. --> 
     <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Release;Platform=Any CPU" Targets="Clean;Build" />
   
-    <PushToRepository ApplicationName="$(ApplicationName1)" ApplicationVersion="$(ApplicationVersion)" PushToDirectory="Release" SourceDirectoryOrFile="$(SolutionDirectory)\Target\bin\Release" BaseRepositoryLocation="$(BASE_REPO_HOME)" Verbose="$(VERBOSE)" />
+    <PushToRepository ApplicationName="$(ApplicationName)" ApplicationVersion="$(ApplicationVersion)" PushToDirectory="Release" SourceDirectoryOrFile="$(SolutionDirectory)\Target\bin\Release" BaseRepositoryLocation="$(BASE_REPO_HOME)" Verbose="$(VERBOSE)" />
     
     <PushToRepository ApplicationName="$(ApplicationName2)" ApplicationVersion="$(ApplicationVersion)" PushToDirectory="Release" SourceDirectoryOrFile="$(SolutionDirectory)\GDNetworkJSONService\bin\Debug" BaseRepositoryLocation="$(BASE_REPO_HOME)" Verbose="$(VERBOSE)" />
     
