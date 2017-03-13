@@ -26,7 +26,6 @@ namespace GDNetworkJSONService
         private Timer _diagnosticsTimer;
         private long _diagnosticsInterval;
 
-        private readonly MessageLogger _messageLogger = LoggerFactory.GetMessageLogger();
         private readonly CommandLineModel _commandLineModel;
 
         public GDService(CommandLineModel model)
@@ -48,11 +47,14 @@ namespace GDNetworkJSONService
 
         protected override void OnStart(string[] args)
         {
-            var instrumentationlogger = LoggerFactory.GetInstrumentationLogger();
+            var instrumentationlogger = LoggerFactory.GetInstrumentationLogger(false);
             instrumentationlogger.InitializeExecutionLogging($"{this.GetRealServiceName(ServiceName)} Startup");
 
             try
             {
+                var configLogger = LoggerFactory.GetConfigLogger(false);
+                configLogger.LogConfigSettings();
+
                 using (var dbConnection = LogStorageDbGlobals.OpenNewConnection())
                 {
                     if (!LogStorageTable.TableExists(dbConnection))
@@ -113,13 +115,14 @@ namespace GDNetworkJSONService
 
         private void SetupDiagnosticsSchedule()
         {
+            var messageLogger = LoggerFactory.GetMessageLogger(false);
             try
             {
                 if (!_isRunning) return;
                 _diagnosticsTimer = new Timer(DiagnosticsCallback);
                 
                 var mode = AppSettingsHelper.DiagnosticsScheduleMode;
-                _messageLogger.PushInfo($"Diagnostics Schedule Mode: {mode}");
+                messageLogger.PushInfo($"Diagnostics Schedule Mode: {mode}");
 
                 //Set the Default Time.
                 var scheduledTime = DateTime.MinValue;
@@ -153,11 +156,11 @@ namespace GDNetworkJSONService
                 var timeSpan = scheduledTime.Subtract(DateTime.Now);
                 var schedule = $"{timeSpan.Days} day(s) {timeSpan.Hours} hour(s) {timeSpan.Minutes} minute(s) {timeSpan.Seconds} seconds(s)";
 
-                _messageLogger.PushInfo($"Diagnostics scheduled to run in: {schedule}");
+                messageLogger.PushInfo($"Diagnostics scheduled to run in: {schedule}");
 
-                _messageLogger.PushInfo($"Diagnostics scheduled with an interval of: {_diagnosticsInterval} ms");
+                messageLogger.PushInfo($"Diagnostics scheduled with an interval of: {_diagnosticsInterval} ms");
 
-                _messageLogger.LogInfo("Diagnostics Thread Scheduled");
+                messageLogger.LogInfo("Diagnostics Thread Scheduled");
 
                 //Get the difference in Minutes between the Scheduled and Current Time.
                 var dueTime = Convert.ToInt32(timeSpan.TotalMilliseconds);
@@ -168,7 +171,7 @@ namespace GDNetworkJSONService
             }
             catch (Exception ex)
             {
-                _messageLogger.LogError("Diagnostics Thread Scheduling Error", ex);
+                messageLogger.LogError("Diagnostics Thread Scheduling Error", ex);
             }
         }
 
@@ -176,24 +179,37 @@ namespace GDNetworkJSONService
         {
             if (!_isRunning) return;
             var diagnosticsLogger = LoggerFactory.GetDiagnosticsInstrumentationLogger();
+            diagnosticsLogger.LogItemsReceived = Interlocked.Exchange(ref LoggingHub.TotalMessageCount, 0);
             diagnosticsLogger.LogItemsSentFirstTry = Interlocked.Exchange(ref GuaranteedDeliveryThread.TotalSuccessCount, 0);
             diagnosticsLogger.LogItemsFailedFirstTry = Interlocked.Exchange(ref GuaranteedDeliveryThread.TotalFailedCount, 0);
             diagnosticsLogger.LogItemsSentOnRetry = Interlocked.Exchange(ref GuaranteedDeliveryBackupThread.TotalSuccessCount, 0);
             diagnosticsLogger.LogItemsFailedOnRetry = Interlocked.Exchange(ref GuaranteedDeliveryBackupThread.TotalFailedCount, 0);
-            diagnosticsLogger.LogItemsReceived = Interlocked.Exchange(ref LoggingHub.TotalMessageCount, 0);
             diagnosticsLogger.DiagnosticsIntervalMS = _diagnosticsInterval;
             try
             {
                 using (var dbConnection = LogStorageDbGlobals.OpenNewConnection())
                 {
-                    diagnosticsLogger.DeadLetterCount = DeadLetterLogStorageTable.GetDeadLetterCount(dbConnection);
                     diagnosticsLogger.BacklogCount = LogStorageTable.GetBacklogCount(dbConnection);
+                    diagnosticsLogger.DeadLetterCount = DeadLetterLogStorageTable.GetDeadLetterCount(dbConnection);
                 }
             }
             catch (Exception ex)
             {
             }
-            diagnosticsLogger.LogFullDiagnostics();
+
+            if (AppSettingsHelper.SkipZeroDiagnostics)
+            {
+                if (diagnosticsLogger.LogItemsReceived > 0 || diagnosticsLogger.LogItemsSentFirstTry > 0 ||
+                    diagnosticsLogger.LogItemsFailedFirstTry > 0 || diagnosticsLogger.LogItemsSentOnRetry > 0 ||
+                    diagnosticsLogger.LogItemsFailedOnRetry > 0 || diagnosticsLogger.BacklogCount > 0 || diagnosticsLogger.DeadLetterCount > 0)
+                {
+                    diagnosticsLogger.LogFullDiagnostics();
+                }
+            }
+            else
+            {
+                diagnosticsLogger.LogFullDiagnostics();
+            }
         }
 
         protected override void OnStop()

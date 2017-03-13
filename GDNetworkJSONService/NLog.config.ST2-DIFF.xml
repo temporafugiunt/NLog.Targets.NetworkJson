@@ -6,6 +6,7 @@
       throwExceptions="false"
       internalLogLevel="Off" internalLogFile="c:\temp\nlog-internal.log">
   <targets>
+    <target name="GDService" networkJsonEndpoint="tcp://st2-s-loga.pvops.com:8889" />
     <target name="LogStash" endpoint="tcp://st2-s-loga.pvops.com:8889" />
   </targets>
 </nlog>

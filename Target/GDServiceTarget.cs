@@ -36,10 +36,6 @@ namespace NLog.Targets.NetworkJSON
                 {
                     _guaranteedDeliveryEndpoint = new Uri(Environment.ExpandEnvironmentVariables(value));
                     ClearHubConnection();
-                    _localHubConnection = new HubConnection(GuaranteedDeliveryEndpoint);
-                    _localHubProxy = _localHubConnection.CreateHubProxy("GDServiceLogger");
-
-                    _localHubConnection.Start().Wait();
                 }
                 else
                 {
@@ -75,6 +71,13 @@ namespace NLog.Targets.NetworkJSON
                 _localHubConnection = null;
                 _localHubProxy = null;
             }
+        }
+
+        private void InitHubConnection()
+        {
+            _localHubConnection = new HubConnection(GuaranteedDeliveryEndpoint);
+            _localHubProxy = _localHubConnection.CreateHubProxy("GDServiceLogger");
+            _localHubConnection.Start().Wait();
         }
 
         [ArrayParameter(typeof(ParameterInfo), "parameter")]
@@ -125,7 +128,7 @@ namespace NLog.Targets.NetworkJSON
         {
             if (_localHubConnection == null)
             {
-                throw new HubException($"Connection to {_guaranteedDeliveryEndpoint} not initialized");
+                InitHubConnection();
             }
             if(_localHubConnection.State != ConnectionState.Connected)
             {

@@ -37,6 +37,17 @@ namespace GDNetworkJSONService.Helpers
             }
         }
 
+        public static bool SkipZeroDiagnostics
+        {
+            get
+            {
+                var skipZeroDiagsStr = ConfigurationManager.AppSettings["SkipZeroDiagnostics"];
+                var skipZeroDiags = false;
+                // Default of true if not present.
+                return bool.TryParse(skipZeroDiagsStr, out skipZeroDiags) ? skipZeroDiags : true;
+            }
+        }
+
         public static int DbSelectCount
         {
             get
