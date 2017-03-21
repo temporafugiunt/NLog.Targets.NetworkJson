@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using NLog.Config;
 using NLog.Layouts;
 using Microsoft.AspNet.SignalR.Client;
+using NLog.Common;
 
 namespace NLog.Targets.NetworkJSON
 {
@@ -77,7 +78,15 @@ namespace NLog.Targets.NetworkJSON
         {
             _localHubConnection = new HubConnection(GuaranteedDeliveryEndpoint);
             _localHubProxy = _localHubConnection.CreateHubProxy("GDServiceLogger");
-            _localHubConnection.Start().Wait();
+            try
+            {
+                _localHubConnection.Start().Wait();
+            }
+            catch (System.Exception)
+            {
+
+            }
+            
         }
 
         [ArrayParameter(typeof(ParameterInfo), "parameter")]
@@ -102,9 +111,9 @@ namespace NLog.Targets.NetworkJSON
             Write(logEvent);
         }
 
-        protected override async void Write(LogEventInfo logEvent)
+        protected override void Write(LogEventInfo logEvent)
         {
-            foreach (var par in this.Parameters)
+            foreach (var par in Parameters)
             {
                 if (!logEvent.Properties.ContainsKey(par.Name))
                 {
@@ -118,7 +127,8 @@ namespace NLog.Targets.NetworkJSON
             if (jsonObject == null) return;
             var jsonObjectStr = jsonObject.ToString(Formatting.None, null);
 
-            await WriteAsync(jsonObjectStr);
+            var task = WriteAsync(jsonObjectStr);
+            task.GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -132,9 +142,12 @@ namespace NLog.Targets.NetworkJSON
             }
             if(_localHubConnection.State != ConnectionState.Connected)
             {
-                throw new HubException($"Connection to {_guaranteedDeliveryEndpoint} not online");
+                return Task.FromException(new Exception($"Connection to {_guaranteedDeliveryEndpoint} not online"));
             }
-            return _localHubProxy.Invoke("storeAndForward", NetworkJsonEndpoint, logEventAsJsonString);
+            else
+            {
+                return _localHubProxy.Invoke("storeAndForward", NetworkJsonEndpoint, logEventAsJsonString);
+            }
         }
     }
 }
