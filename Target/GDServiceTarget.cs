@@ -80,11 +80,22 @@ namespace NLog.Targets.NetworkJSON
             _localHubProxy = _localHubConnection.CreateHubProxy("GDServiceLogger");
             try
             {
-                _localHubConnection.Start().Wait();
+                var task = _localHubConnection.Start();
+                task.GetAwaiter().GetResult();
             }
             catch (System.Exception)
             {
-
+                try
+                {
+                    _localHubConnection.Stop();
+                    _localHubConnection.Dispose();
+                }
+                catch (Exception)
+                {
+                    
+                }
+                _localHubConnection = null;
+                _localHubProxy = null;
             }
             
         }
@@ -140,7 +151,7 @@ namespace NLog.Targets.NetworkJSON
             {
                 InitHubConnection();
             }
-            if(_localHubConnection.State != ConnectionState.Connected)
+            if(_localHubConnection == null || _localHubConnection.State != ConnectionState.Connected)
             {
                 return Task.FromException(new Exception($"Connection to {_guaranteedDeliveryEndpoint} not online"));
             }
