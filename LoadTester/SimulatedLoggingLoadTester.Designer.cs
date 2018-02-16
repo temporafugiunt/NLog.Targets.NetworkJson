@@ -53,7 +53,7 @@
             this.txtActivityLog = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.btnCancelLoadTest = new System.Windows.Forms.Button();
-            this.txtGuaranteedDeliveryEndpoint = new System.Windows.Forms.TextBox();
+            this.txtGuaranteedDeliveryDbName = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgvLoadTestCallLog)).BeginInit();
             this.tableLayoutPanel5.SuspendLayout();
@@ -216,7 +216,7 @@
             this.tableLayoutPanel5.Controls.Add(this.label3, 0, 4);
             this.tableLayoutPanel5.Controls.Add(this.btnCancelLoadTest, 2, 3);
             this.tableLayoutPanel5.Controls.Add(this.btnExecuteLoadTest, 2, 2);
-            this.tableLayoutPanel5.Controls.Add(this.txtGuaranteedDeliveryEndpoint, 1, 0);
+            this.tableLayoutPanel5.Controls.Add(this.txtGuaranteedDeliveryDbName, 1, 0);
             this.tableLayoutPanel5.Controls.Add(this.label4, 0, 0);
             this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel5.Location = new System.Drawing.Point(0, 0);
@@ -325,17 +325,17 @@
             this.btnCancelLoadTest.UseVisualStyleBackColor = true;
             this.btnCancelLoadTest.Click += new System.EventHandler(this.btnCancelLoadTest_Click);
             // 
-            // txtGuaranteedDeliveryEndpoint
+            // txtGuaranteedDeliveryDbName
             // 
-            this.txtGuaranteedDeliveryEndpoint.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.txtGuaranteedDeliveryDbName.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtGuaranteedDeliveryEndpoint.Location = new System.Drawing.Point(381, 4);
-            this.txtGuaranteedDeliveryEndpoint.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.txtGuaranteedDeliveryEndpoint.Name = "txtGuaranteedDeliveryEndpoint";
-            this.txtGuaranteedDeliveryEndpoint.Size = new System.Drawing.Size(498, 20);
-            this.txtGuaranteedDeliveryEndpoint.TabIndex = 30;
-            this.txtGuaranteedDeliveryEndpoint.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.txtGuaranteedDeliveryDbName.Location = new System.Drawing.Point(381, 4);
+            this.txtGuaranteedDeliveryDbName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtGuaranteedDeliveryDbName.Name = "txtGuaranteedDeliveryDbName";
+            this.txtGuaranteedDeliveryDbName.Size = new System.Drawing.Size(498, 20);
+            this.txtGuaranteedDeliveryDbName.TabIndex = 30;
+            this.txtGuaranteedDeliveryDbName.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // label4
             // 
@@ -347,7 +347,7 @@
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(372, 31);
             this.label4.TabIndex = 29;
-            this.label4.Text = "Guaranteed Delivery Endpoint:";
+            this.label4.Text = "Guaranteed Delivery DB Name:";
             // 
             // SimulatedLoggingLoadTeser
             // 
@@ -389,7 +389,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colNumTiomesFailed;
         private System.Windows.Forms.DataGridViewTextBoxColumn colAvgFailedTime;
         private System.Windows.Forms.DataGridViewTextBoxColumn colLastErrorMessage;
-        private System.Windows.Forms.TextBox txtGuaranteedDeliveryEndpoint;
+        private System.Windows.Forms.TextBox txtGuaranteedDeliveryDbName;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox txtNetworkJsonEndpoint;

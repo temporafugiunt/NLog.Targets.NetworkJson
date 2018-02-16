@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using GDNetworkJSONService.Helpers;
 using GDNetworkJSONService.LocalLogStorageDB;
 using NLog.Targets.NetworkJSON.ExtensionMethods;
@@ -84,12 +86,12 @@ namespace GDNetworkJSONService.Models
                     ErrorInfo.Add("Endpoint is not properly setup in the application configuration and was not passed at the command line.");
                 }
             }
-            if (LocalLogStorage.IsNullOrEmpty())
+            if (GbDbsPath.IsNullOrEmpty())
             {
-                LocalLogStorage = ConfigurationManager.ConnectionStrings["LocalLogStorage"]?.ConnectionString;
-                if (LocalLogStorage.IsNullOrEmpty())
+                GbDbsPath = ConfigurationManager.AppSettings["GdDbsPath"];
+                if (GbDbsPath.IsNullOrEmpty())
                 {
-                    ErrorInfo.Add("LocalLogStorage is not properly setup in the application configuration and was not passed at the command line.");
+                    ErrorInfo.Add("Guaranteed Delivery DBs Path is not properly setup in the application configuration and was not passed at the command line.");
                 }
             }
             if (DbSelectCount < 1)
@@ -184,31 +186,33 @@ namespace GDNetworkJSONService.Models
             }
         }
 
-        public string LocalLogStorage
+        public string GbDbsPath
         {
             get
             {
-                return LogStorageDbGlobals.ConnectionString;
+                return LogStorageDbGlobals.GbDbsPath;
             }
             set
             {
                 if (value.IsNullOrEmpty())
                 {
-                    LogStorageDbGlobals.ConnectionString = "";
+                    LogStorageDbGlobals.GbDbsPath = "";
                     return;
                 }
-                if(value.Length > 3 && (value.StartsWith("\"") || value.StartsWith("'")))
+                
+                try
                 {
-                    LogStorageDbGlobals.ConnectionString = value.Substring(0, value.Length - 2);
+                    if (!Directory.Exists(value)) Directory.CreateDirectory(value);
+                    LogStorageDbGlobals.GbDbsPath = value;
+                    ParameterInfo.Add($"Guaranteed Delivery DBs Path = {LogStorageDbGlobals.GbDbsPath}");
                 }
-                else
+                catch
                 {
-                    LogStorageDbGlobals.ConnectionString = value;
+                    throw new Exception($"GdDbsPath '{value}' could not be created.");
                 }
-                ParameterInfo.Add($"Log Log Storage Connection String = {LogStorageDbGlobals.ConnectionString}");
             }
         }
-
+        
         public int DbSelectCount
         {
             get

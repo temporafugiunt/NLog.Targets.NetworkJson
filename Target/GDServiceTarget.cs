@@ -1,50 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
+using System.Data.SQLite;
+using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NLog.Config;
-using NLog.Layouts;
-using Microsoft.AspNet.SignalR.Client;
-using NLog.Common;
+using NLog.Targets.NetworkJSON.ExtensionMethods;
+using NLog.Targets.NetworkJSON.LocalLogStorageDB;
 
 namespace NLog.Targets.NetworkJSON
 {
     [Target("GDService")]
     public class GDServiceTarget : TargetWithLayout
     {
-        #region NetworkJson Reliability Service Variables
+        #region Guaranteed Delivery Service Variables
 
-        private HubConnection _localHubConnection;
-        private IHubProxy _localHubProxy;
-        private Uri _guaranteedDeliveryEndpoint;
         private Uri _networkJsonEndpoint;
+        private SQLiteConnection _dbConnection;
+        private bool _disposed;
 
         #endregion
 
         #region Task Properties
 
         [Required]
-        public string GuaranteedDeliveryEndpoint
-        {
-            get { return _guaranteedDeliveryEndpoint.ToString(); }
-            set
-            {
-                if (value != null)
-                {
-                    _guaranteedDeliveryEndpoint = new Uri(Environment.ExpandEnvironmentVariables(value));
-                    ClearHubConnection();
-                }
-                else
-                {
-                    _guaranteedDeliveryEndpoint = null;
-                    ClearHubConnection();
-                }
-            }
-        }
+        public string GuaranteedDeliveryDB { get; set; }
 
         [Required]
         public string NetworkJsonEndpoint
@@ -63,41 +45,54 @@ namespace NLog.Targets.NetworkJSON
             }
         }
 
-        private void ClearHubConnection()
+        [Required]
+        public string NetworkJsonType { get; set; }
+
+        private void VerifyDbConnection()
         {
-            if (_localHubConnection != null)
+            if (_dbConnection == null)
             {
-                _localHubConnection.Stop();
-                _localHubConnection.Dispose();
-                _localHubConnection = null;
-                _localHubProxy = null;
+                if(!File.Exists(GuaranteedDeliveryDB)) VerifyDbDirectory();
+                _dbConnection = LogStorageConnection.OpenConnection(GuaranteedDeliveryDB);
+                Debug.WriteLine($"Db Connection Created.");
+                
+                if(!LogStorageTable.TableExists(_dbConnection)) { LogStorageTable.CreateTable(_dbConnection); }
             }
         }
 
-        private void InitHubConnection()
+        private void VerifyDbDirectory()
         {
-            _localHubConnection = new HubConnection(GuaranteedDeliveryEndpoint);
-            _localHubProxy = _localHubConnection.CreateHubProxy("GDServiceLogger");
+            var fileInfo = new FileInfo(GuaranteedDeliveryDB);
             try
             {
-                var task = _localHubConnection.Start();
-                task.GetAwaiter().GetResult();
+                var dbDirectory = fileInfo.Directory?.FullName;
+                if(dbDirectory.IsNullOrEmpty()) throw new Exception();
+                if (!Directory.Exists(dbDirectory)) Directory.CreateDirectory(dbDirectory);
             }
-            catch (System.Exception)
+            catch 
             {
-                try
-                {
-                    _localHubConnection.Stop();
-                    _localHubConnection.Dispose();
-                }
-                catch (Exception)
-                {
-                    
-                }
-                _localHubConnection = null;
-                _localHubProxy = null;
+                throw new Exception($"Unable to create or verify the directory structure for {GuaranteedDeliveryDB}");
             }
-            
+        }
+
+        private void CloseDbConnection()
+        {
+            if (_dbConnection == null) return;
+            Debug.WriteLine("DB Connection Closed.");
+            _dbConnection.Close();
+            _dbConnection.Dispose();
+            _dbConnection = null;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            if (disposing)
+            {
+                CloseDbConnection();
+            }
+            _disposed = true;
+            base.Dispose(disposing);
         }
 
         [ArrayParameter(typeof(ParameterInfo), "parameter")]
@@ -137,27 +132,36 @@ namespace NLog.Targets.NetworkJSON
             var jsonObject = Converter.GetLogEventJson(logEvent);
             if (jsonObject == null) return;
             var jsonObjectStr = jsonObject.ToString(Formatting.None, null);
-
-            var task = WriteAsync(jsonObjectStr);
-            task.GetAwaiter().GetResult();
+            Write(jsonObjectStr);
         }
 
-        /// <summary>
-        /// Exposed for unit testing and load testing purposes.
-        /// </summary>
-        public Task WriteAsync(string logEventAsJsonString)
+        public void Write(string logEventAsJsonString)
         {
-            if (_localHubConnection == null)
+            try
             {
-                InitHubConnection();
+                VerifyDbConnection();
+                LogStorageTable.TableExists(_dbConnection);
+                LogStorageTable.InsertLogRecord(_dbConnection, NetworkJsonEndpoint, NetworkJsonType, logEventAsJsonString);
             }
-            if(_localHubConnection == null || _localHubConnection.State != ConnectionState.Connected)
+            catch (Exception)
             {
-                return Task.FromException(new Exception($"Connection to {_guaranteedDeliveryEndpoint} not online"));
+                CloseDbConnection();
+                throw;
             }
-            else
+        }
+
+        public async Task WriteAsync(string logEventAsJsonString)
+        {
+            try
             {
-                return _localHubProxy.Invoke("storeAndForward", NetworkJsonEndpoint, logEventAsJsonString);
+                VerifyDbConnection();
+                LogStorageTable.TableExists(_dbConnection);
+                await LogStorageTable.InsertLogRecordAsync(_dbConnection, NetworkJsonEndpoint, NetworkJsonType, logEventAsJsonString);
+            }
+            catch (Exception)
+            {
+                CloseDbConnection();
+                throw;
             }
         }
     }

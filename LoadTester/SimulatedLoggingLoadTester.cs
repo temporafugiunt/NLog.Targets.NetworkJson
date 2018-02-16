@@ -165,7 +165,7 @@ namespace NLog.Targets.NetworkJSON.LoadTester
             var loadTestThreadDatas = SetupLoadTestThreadList(numThreads, numTimesPerThread);
 
             // This query when executed will return a collection of tasks.
-            var loadTestThreadsQuery = from loadTestThreadData in loadTestThreadDatas select LoadTestManager.RunThreadLoadTestsSimulateLoggingAsync(txtGuaranteedDeliveryEndpoint.Text, txtNetworkJsonEndpoint.Text, loadTestThreadData, ct);
+            var loadTestThreadsQuery = from loadTestThreadData in loadTestThreadDatas select LoadTestManager.RunThreadLoadTestsSimulateLoggingAsync(txtGuaranteedDeliveryDbName.Text, txtNetworkJsonEndpoint.Text, "logstash", loadTestThreadData, ct);
 
             LogActivity("Loading new threads.");
             // ToList executes the query and start the tasks. 
@@ -209,7 +209,7 @@ namespace NLog.Targets.NetworkJSON.LoadTester
             {
                 _testDocuments.Add(new Tuple<string, string>(resourceDocFileName, Resources.ResourceManager.GetString(resourceDocFileName)));
             }
-            txtGuaranteedDeliveryEndpoint.Text = ConfigurationManager.AppSettings["GuaranteedDeliveryEndpoint"];
+            txtGuaranteedDeliveryDbName.Text = ConfigurationManager.AppSettings["GdDbPath"];
             txtNetworkJsonEndpoint.Text = ConfigurationManager.AppSettings["NetworkJsonEndpoint"];
         }
         private void LogActivity(string message)

@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace GDNetworkJSONService.LocalLogStorageDB
+namespace NLog.Targets.NetworkJSON.LocalLogStorageDB
 {
-    internal class LogStorageRecord
+    public class LogStorageRecord
     {
         public Guid Id { get; set; }
         public string EndPoint { get; set; }

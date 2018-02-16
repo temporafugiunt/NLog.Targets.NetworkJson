@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Data;
 using System.Data.SQLite;
-using System.Net;
-using NLog;
+using System.Threading.Tasks;
 using NLog.Targets.NetworkJSON.ExtensionMethods;
 
-namespace GDNetworkJSONService.LocalLogStorageDB
+namespace NLog.Targets.NetworkJSON.LocalLogStorageDB
 {
-    internal class LogStorageTable
+    public class LogStorageTable
     {
         public const string TableName = "LogStorage";
         
@@ -38,6 +37,20 @@ namespace GDNetworkJSONService.LocalLogStorageDB
 
         public static int InsertLogRecord(SQLiteConnection dbConnection, string endpoint, string endpointType, string logMessage)
         {
+            var cmd = BuildInsertCommand(dbConnection, endpointType, endpointType, logMessage);
+
+            return cmd.ExecuteNonQuery();
+        }
+
+        public static async Task<int> InsertLogRecordAsync(SQLiteConnection dbConnection, string endpoint, string endpointType, string logMessage)
+        {
+            var cmd = BuildInsertCommand(dbConnection, endpoint, endpointType, logMessage);
+
+            return await cmd.ExecuteNonQueryAsync();
+        }
+
+        private static SQLiteCommand BuildInsertCommand(SQLiteConnection dbConnection, string endpoint, string endpointType, string logMessage)
+        {
             var dataInsertSql = $"INSERT INTO {TableName} ({Columns.Endpoint.ColumnName}, {Columns.EndpointType.ColumnName}, {Columns.LogMessage.ColumnName}, {Columns.RetryCount.ColumnName}, {Columns.CreatedOn.ColumnName}) VALUES ({Columns.Endpoint.ParameterName}, {Columns.EndpointType.ParameterName}, {Columns.LogMessage.ParameterName}, {Columns.RetryCount.ParameterName}, {Columns.CreatedOn.ParameterName})";
             var cmd = new SQLiteCommand(dataInsertSql, dbConnection);
 
@@ -61,12 +74,14 @@ namespace GDNetworkJSONService.LocalLogStorageDB
             param.Value = DateTime.Now;
             cmd.Parameters.Add(param);
 
-            return cmd.ExecuteNonQuery();
+            return (cmd);
         }
 
-        public static DataTable GetFirstTryRecords(SQLiteConnection dbConnection)
+        
+
+        public static DataTable GetFirstTryRecords(SQLiteConnection dbConnection, int selectCount)
         {
-            var dataSelectSql = $"SELECT * FROM {TableName} WHERE {Columns.RetryCount.ColumnName} = 0 LIMIT {LogStorageDbGlobals.DbSelectCount}";
+            var dataSelectSql = $"SELECT * FROM {TableName} WHERE {Columns.RetryCount.ColumnName} = 0 LIMIT {selectCount}";
             var cmd = new SQLiteCommand(dataSelectSql, dbConnection);
             var dt = new DataTable(TableName);
             var reader = cmd.ExecuteReader();
@@ -74,9 +89,9 @@ namespace GDNetworkJSONService.LocalLogStorageDB
             return dt;
         }
 
-        public static DataTable GetRetryRecords(SQLiteConnection dbConnection)
+        public static DataTable GetRetryRecords(SQLiteConnection dbConnection, int selectCount)
         {
-            var dataSelectSql = $"SELECT * FROM {TableName} WHERE {Columns.RetryCount.ColumnName} > 0 ORDER BY RetryCount ASC, MessageId ASC LIMIT {LogStorageDbGlobals.DbSelectCount}";
+            var dataSelectSql = $"SELECT * FROM {TableName} WHERE {Columns.RetryCount.ColumnName} > 0 ORDER BY RetryCount ASC, MessageId ASC LIMIT {selectCount}";
             var cmd = new SQLiteCommand(dataSelectSql, dbConnection);
             var dt = new DataTable(TableName);
             var reader = cmd.ExecuteReader();

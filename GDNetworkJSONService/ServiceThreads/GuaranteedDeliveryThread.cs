@@ -4,17 +4,25 @@ using System.Data.SQLite;
 using System.Threading;
 using GDNetworkJSONService.LocalLogStorageDB;
 using NLog.Targets.NetworkJSON;
+using NLog.Targets.NetworkJSON.LocalLogStorageDB;
 
 namespace GDNetworkJSONService.ServiceThreads
 {
     internal class GuaranteedDeliveryThreadDelegate
     {
+        public GuaranteedDeliveryThreadDelegate(string dbFilePath)
+        {
+            DbFilePath = dbFilePath;
+        }
+
         #region Public Properties
 
         public bool IsRunning { get; private set; }
 
         public bool IsAppShuttingDown { get; private set; }
-        
+
+        public string DbFilePath { get; }
+
         #endregion
 
         public void RegisterThreadShutdown()
@@ -43,10 +51,10 @@ namespace GDNetworkJSONService.ServiceThreads
                 {
                     if (dbConnection == null)
                     {
-                        dbConnection = LogStorageDbGlobals.OpenNewConnection();
+                        dbConnection = LogStorageConnection.OpenConnection(threadData.DbFilePath);
                     }
 
-                    var logMessages = LogStorageTable.GetFirstTryRecords(dbConnection);
+                    var logMessages = LogStorageTable.GetFirstTryRecords(dbConnection, LogStorageDbGlobals.DbSelectCount);
                     if (logMessages.Rows.Count == 0)
                     {
                         Thread.Sleep(500);
@@ -57,6 +65,7 @@ namespace GDNetworkJSONService.ServiceThreads
                         {
                             var messageId = (long)logMessages.Rows[inc][LogStorageTable.Columns.MessageId.Index];
                             var endpoint = logMessages.Rows[inc][LogStorageTable.Columns.Endpoint.Index].ToString();
+                            var endpointType = logMessages.Rows[inc][LogStorageTable.Columns.EndpointType.Index].ToString();
                             var logMessage = logMessages.Rows[inc][LogStorageTable.Columns.LogMessage.Index].ToString();
                             NetworkJsonTarget currentTarget = null;
                             if (!targets.TryGetValue(endpoint, out currentTarget))

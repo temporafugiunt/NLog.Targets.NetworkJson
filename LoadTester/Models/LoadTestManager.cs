@@ -10,50 +10,58 @@ namespace NLog.Targets.NetworkJSON.LoadTester.Models
 {
     public static class LoadTestManager
     {
-        public static async Task<LoadTestThreadResults> RunThreadLoadTestsSimulateLoggingAsync(string endpoint, string logStashEndpoint, LoadTestThreadData threadData, CancellationToken ct)
+        public static async Task<LoadTestThreadResults> RunThreadLoadTestsSimulateLoggingAsync(string gdDbPath, string networkJsonEndpoint, string networkJsonEndpointType, LoadTestThreadData threadData, CancellationToken ct)
         {
             Debug.Print("Entered RunThreadLoadTestsAsync.");
 
             var loadTestResults = new LoadTestThreadResults(threadData.ThreadID) { };
 
-            var target = new GDServiceTarget {GuaranteedDeliveryEndpoint = endpoint, NetworkJsonEndpoint = logStashEndpoint};
-            Debug.Print("New GDServiceTarget Created.");
-
-            // Logging Operations
-            // =================================
-            for (var inc = 0; inc < threadData.NumTimesToExecute; inc++)
+            using (var target = new GDServiceTarget
+                {
+                    GuaranteedDeliveryDB = gdDbPath,
+                    NetworkJsonEndpoint = networkJsonEndpoint,
+                    NetworkJsonType = networkJsonEndpointType
+                })
             {
-                var rnd = new Random();
-                var rInt = rnd.Next(0, threadData.TestDocuments.Count - 1);
-                var currentTestDocument = threadData.TestDocuments[rInt];
-                var docStorageCallData = new SignalRCallData()
-                {
-                    TestDataName = currentTestDocument.Item1,
-                    TotalBytes = currentTestDocument.Item2.Length
-                };
+                Debug.Print("New GDServiceTarget Created.");
 
-                var sw = Stopwatch.StartNew();
-                try
+                // Logging Operations
+                // =================================
+                for (var inc = 0; inc < threadData.NumTimesToExecute; inc++)
                 {
-                    await target.WriteAsync(currentTestDocument.Item2);
+                    var rnd = new Random();
+                    var rInt = rnd.Next(0, threadData.TestDocuments.Count - 1);
+                    var currentTestDocument = threadData.TestDocuments[rInt];
+                    var docStorageCallData = new SignalRCallData()
+                    {
+                        TestDataName = currentTestDocument.Item1,
+                        TotalBytes = currentTestDocument.Item2.Length
+                    };
+
+                    var sw = Stopwatch.StartNew();
+                    try
+                    {
+                        await target.WriteAsync(currentTestDocument.Item2);
                     
-                    sw.Stop();
-                    docStorageCallData.CallTimeMS = sw.ElapsedMilliseconds;
-                    docStorageCallData.BytesPerMS = docStorageCallData.TotalBytes / (double)docStorageCallData.CallTimeMS;
+                        sw.Stop();
+                        docStorageCallData.CallTimeMS = sw.ElapsedMilliseconds;
+                        docStorageCallData.BytesPerMS = docStorageCallData.TotalBytes / (double)docStorageCallData.CallTimeMS;
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception)
+                    {
+                        sw.Stop();
+                        docStorageCallData.CallTimeMS = sw.ElapsedMilliseconds;
+                        docStorageCallData.CallFailed = true;
+                    }
+                    loadTestResults.CallStats.Add(docStorageCallData);
+                    ct.ThrowIfCancellationRequested();
                 }
-                catch (OperationCanceledException)
-                {
-                    throw;
-                }
-                catch (Exception)
-                {
-                    sw.Stop();
-                    docStorageCallData.CallTimeMS = sw.ElapsedMilliseconds;
-                    docStorageCallData.CallFailed = true;
-                }
-                loadTestResults.CallStats.Add(docStorageCallData);
-                ct.ThrowIfCancellationRequested();
             }
+                
 
             return loadTestResults;
         }

@@ -53,7 +53,7 @@ namespace GDNetworkJSONService
                         }
                         throw new Exception(sb.ToString());
                     }
-                    // Set all defaults when runnning as a service if a command line wasn't set when installing the service.
+                    // Set all defaults when running as a service if a command line wasn't set when installing the service.
                     model.SetForServiceRun();
 
                     OutputModelInfo(CommandLineModel.ParseCommandLineStatus.ExecuteProgram, model);

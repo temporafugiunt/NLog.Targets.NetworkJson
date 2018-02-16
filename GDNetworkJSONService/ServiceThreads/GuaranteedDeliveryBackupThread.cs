@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Common.CommandTrees;
 using System.Data.SQLite;
 using System.Threading;
 using GDNetworkJSONService.LocalLogStorageDB;
 using NLog.Targets.NetworkJSON;
+using NLog.Targets.NetworkJSON.LocalLogStorageDB;
 
 namespace GDNetworkJSONService.ServiceThreads
 {
@@ -11,6 +13,8 @@ namespace GDNetworkJSONService.ServiceThreads
     {
         public static int TotalSuccessCount;
         public static int TotalFailedCount;
+
+        public string DbFilePath { get; }
 
         public static void ThreadMethod(GuaranteedDeliveryThreadDelegate threadData)
         {
@@ -22,10 +26,10 @@ namespace GDNetworkJSONService.ServiceThreads
                 {
                     if (dbConnection == null)
                     {
-                        dbConnection = LogStorageDbGlobals.OpenNewConnection();
+                        dbConnection = LogStorageConnection.OpenConnection(threadData.DbFilePath);
                     }
 
-                    var logMessages = LogStorageTable.GetRetryRecords(dbConnection);
+                    var logMessages = LogStorageTable.GetRetryRecords(dbConnection, LogStorageDbGlobals.DbSelectCount);
                     if (logMessages.Rows.Count == 0)
                     {
                         Thread.Sleep(60000);
@@ -36,6 +40,7 @@ namespace GDNetworkJSONService.ServiceThreads
                         {
                             var messageId = (long)logMessages.Rows[inc][LogStorageTable.Columns.MessageId.Index];
                             var endpoint = logMessages.Rows[inc][LogStorageTable.Columns.Endpoint.Index].ToString();
+                            var endPointType = logMessages.Rows[inc][LogStorageTable.Columns.EndpointType.Index].ToString();
                             var logMessage = logMessages.Rows[inc][LogStorageTable.Columns.LogMessage.Index].ToString();
                             var retryCount = (long)logMessages.Rows[inc][LogStorageTable.Columns.RetryCount.Index];
                             var createdOn = (DateTime) logMessages.Rows[inc][LogStorageTable.Columns.CreatedOn.Index];
@@ -57,7 +62,7 @@ namespace GDNetworkJSONService.ServiceThreads
                                 var recordAge = DateTime.Now - createdOn;
                                 if (recordAge.Minutes > LogStorageDbGlobals.MinutesTillDeadLetter)
                                 {
-                                    DeadLetterLogStorageTable.InsertLogRecord(dbConnection, endpoint, logMessage, createdOn, retryCount);
+                                    DeadLetterLogStorageTable.InsertLogRecord(dbConnection, endpoint, endPointType, logMessage, createdOn, retryCount);
                                     LogStorageTable.DeleteProcessedRecord(dbConnection, messageId);
                                 }
                                 else

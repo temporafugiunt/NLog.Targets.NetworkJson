@@ -1,16 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ServiceProcess;
 using System.Threading;
 using GDNetworkJSONService;
 using GDNetworkJSONService.ExtensionMethods;
 using GDNetworkJSONService.Helpers;
-using GDNetworkJSONService.Hubs;
 using GDNetworkJSONService.LocalLogStorageDB;
 using GDNetworkJSONService.Loggers;
 using GDNetworkJSONService.Models;
-using GDNetworkJSONService.ServiceThreads;
+using GDNetworkJSONService.Services;
 using Microsoft.Owin;
-using Microsoft.Owin.Hosting;
 using NLog.Targets.NetworkJSON.ExtensionMethods;
 
 [assembly: OwinStartup(typeof(OwinStartup))]
@@ -19,12 +18,10 @@ namespace GDNetworkJSONService
 {
     partial class GDService : ServiceBase
     {
-        private IDisposable _signalR;
-        private GuaranteedDeliveryThreadDelegate _guaranteedDeliveryThreadDelegate;
-        private GuaranteedDeliveryThreadDelegate _guaranteedDeliveryBackupThreadDelegate;
         private bool _isRunning = true;
         private Timer _diagnosticsTimer;
         private long _diagnosticsInterval;
+        private Dictionary<string, GdDbService> _dbThreads = new Dictionary<string, GdDbService>();  
 
         private readonly CommandLineModel _commandLineModel;
 
@@ -55,61 +52,18 @@ namespace GDNetworkJSONService
                 var configLogger = LoggerFactory.GetConfigLogger(false);
                 configLogger.LogConfigSettings();
 
-                using (var dbConnection = LogStorageDbGlobals.OpenNewConnection())
-                {
-                    if (!LogStorageTable.TableExists(dbConnection))
-                    {
-                        instrumentationlogger.PushInfo($"{LogStorageTable.TableName} does not exist, creating.");
-                        LogStorageTable.CreateTable(dbConnection);
-                        instrumentationlogger.PushInfoWithTime($"{LogStorageTable.TableName} created.");
-                    }
-                    if (!DeadLetterLogStorageTable.TableExists(dbConnection))
-                    {
-                        instrumentationlogger.PushInfo($"{DeadLetterLogStorageTable.TableName} does not exist, creating.");
-                        DeadLetterLogStorageTable.CreateTable(dbConnection);
-                        instrumentationlogger.PushInfoWithTime($"{DeadLetterLogStorageTable.TableName} created.");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("SQLite Database Opening / Creation Failed.", ex);
-            }
+                // Setup initial DB threads based on startup list of GD Logging Databases found.
+                MaintainGdDbList();
 
-            try
-            {
-                var options = new StartOptions();
-                options.Urls.Add(_commandLineModel.Endpoint);
-            
-                _signalR = WebApp.Start(options);
-                instrumentationlogger.PushInfoWithTime("SignalR Web App Started.");
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("SignalR Hub Initialization Failed.", ex);
-            }
-
-            try
-            {
-                _guaranteedDeliveryThreadDelegate = new GuaranteedDeliveryThreadDelegate();
-
-                var thread = new Thread(() => GuaranteedDeliveryThread.ThreadMethod(_guaranteedDeliveryThreadDelegate));
-                thread.Start();
-                instrumentationlogger.PushInfoWithTime("Guaranteed Delivery Thread Started.");
-
-                _guaranteedDeliveryBackupThreadDelegate = new GuaranteedDeliveryThreadDelegate();
-
-                thread = new Thread(() => GuaranteedDeliveryBackupThread.ThreadMethod(_guaranteedDeliveryBackupThreadDelegate));
-                thread.Start();
-                instrumentationlogger.PushInfoWithTime("Guaranteed Delivery Backup Thread Started.");
-
+                // The diagnostics thread also runs MaintainGdDbList() as its last operation to service Dbs that appear 
+                // after this service has already started up.
                 SetupDiagnosticsSchedule();
             }
             catch (Exception ex)
             {
-                throw new Exception("Guaranteed Delivery or Diagnostics Thread Initialization Failed.", ex);
+                throw new Exception($"{this.GetRealServiceName(ServiceName)} base initialization failure.", ex);
             }
-
+            
             instrumentationlogger.LogExecutionComplete(0);
         }
 
@@ -175,41 +129,62 @@ namespace GDNetworkJSONService
             }
         }
 
+        private void MaintainGdDbList()
+        {
+            lock (_dbThreads)
+            {
+                var currentGdDbs = GdDbHelper.GetGdDbListFromDirectory(LogStorageDbGlobals.GbDbsPath);
+                foreach (var gdDb in currentGdDbs)
+                {
+                    if (_dbThreads.ContainsKey(gdDb)) continue;
+                    // New DB has come online.
+                    var gdDbService = new GdDbService(this.GetRealServiceName(ServiceName), gdDb);
+                    gdDbService.StartServiceThreads();
+                    _dbThreads.Add(gdDb, gdDbService);
+                }
+            }
+        }
+
+        
+
         private void DiagnosticsCallback(object state)
         {
             if (!_isRunning) return;
-            var diagnosticsLogger = LoggerFactory.GetDiagnosticsInstrumentationLogger();
-            diagnosticsLogger.LogItemsReceived = Interlocked.Exchange(ref LoggingHub.TotalMessageCount, 0);
-            diagnosticsLogger.LogItemsSentFirstTry = Interlocked.Exchange(ref GuaranteedDeliveryThread.TotalSuccessCount, 0);
-            diagnosticsLogger.LogItemsFailedFirstTry = Interlocked.Exchange(ref GuaranteedDeliveryThread.TotalFailedCount, 0);
-            diagnosticsLogger.LogItemsSentOnRetry = Interlocked.Exchange(ref GuaranteedDeliveryBackupThread.TotalSuccessCount, 0);
-            diagnosticsLogger.LogItemsFailedOnRetry = Interlocked.Exchange(ref GuaranteedDeliveryBackupThread.TotalFailedCount, 0);
-            diagnosticsLogger.DiagnosticsIntervalMS = _diagnosticsInterval;
-            try
-            {
-                using (var dbConnection = LogStorageDbGlobals.OpenNewConnection())
-                {
-                    diagnosticsLogger.BacklogCount = LogStorageTable.GetBacklogCount(dbConnection);
-                    diagnosticsLogger.DeadLetterCount = DeadLetterLogStorageTable.GetDeadLetterCount(dbConnection);
-                }
-            }
-            catch (Exception ex)
-            {
-            }
+            // TODO: Needs rewrite.
+            //var diagnosticsLogger = LoggerFactory.GetDiagnosticsInstrumentationLogger();
+            //diagnosticsLogger.LogItemsReceived = Interlocked.Exchange(ref LoggingHub.TotalMessageCount, 0);
+            //diagnosticsLogger.LogItemsSentFirstTry = Interlocked.Exchange(ref GuaranteedDeliveryThread.TotalSuccessCount, 0);
+            //diagnosticsLogger.LogItemsFailedFirstTry = Interlocked.Exchange(ref GuaranteedDeliveryThread.TotalFailedCount, 0);
+            //diagnosticsLogger.LogItemsSentOnRetry = Interlocked.Exchange(ref GuaranteedDeliveryBackupThread.TotalSuccessCount, 0);
+            //diagnosticsLogger.LogItemsFailedOnRetry = Interlocked.Exchange(ref GuaranteedDeliveryBackupThread.TotalFailedCount, 0);
+            //diagnosticsLogger.DiagnosticsIntervalMS = _diagnosticsInterval;
+            //try
+            //{
+            //    using (var dbConnection = LogStorageDbGlobals.OpenNewConnection())
+            //    {
+            //        diagnosticsLogger.BacklogCount = LogStorageTable.GetBacklogCount(dbConnection);
+            //        diagnosticsLogger.DeadLetterCount = DeadLetterLogStorageTable.GetDeadLetterCount(dbConnection);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //}
 
-            if (AppSettingsHelper.SkipZeroDiagnostics)
-            {
-                if (diagnosticsLogger.LogItemsReceived > 0 || diagnosticsLogger.LogItemsSentFirstTry > 0 ||
-                    diagnosticsLogger.LogItemsFailedFirstTry > 0 || diagnosticsLogger.LogItemsSentOnRetry > 0 ||
-                    diagnosticsLogger.LogItemsFailedOnRetry > 0 || diagnosticsLogger.BacklogCount > 0 || diagnosticsLogger.DeadLetterCount > 0)
-                {
-                    diagnosticsLogger.LogFullDiagnostics();
-                }
-            }
-            else
-            {
-                diagnosticsLogger.LogFullDiagnostics();
-            }
+            //if (AppSettingsHelper.SkipZeroDiagnostics)
+            //{
+            //    if (diagnosticsLogger.LogItemsReceived > 0 || diagnosticsLogger.LogItemsSentFirstTry > 0 ||
+            //        diagnosticsLogger.LogItemsFailedFirstTry > 0 || diagnosticsLogger.LogItemsSentOnRetry > 0 ||
+            //        diagnosticsLogger.LogItemsFailedOnRetry > 0 || diagnosticsLogger.BacklogCount > 0 || diagnosticsLogger.DeadLetterCount > 0)
+            //    {
+            //        diagnosticsLogger.LogFullDiagnostics();
+            //    }
+            //}
+            //else
+            //{
+            //    diagnosticsLogger.LogFullDiagnostics();
+            //}
+
+            MaintainGdDbList();
         }
 
         protected override void OnStop()
@@ -220,27 +195,49 @@ namespace GDNetworkJSONService
             logger.InitializeExecutionLogging($"{this.GetRealServiceName(ServiceName)} Shutdown");
 
             _isRunning = false;
-            _signalR?.Dispose();
-            _guaranteedDeliveryThreadDelegate.RegisterThreadShutdown();
-            _guaranteedDeliveryBackupThreadDelegate.RegisterThreadShutdown();
+            var runningServiceCount = 1;
+
+            lock (_dbThreads)
+            {
+                foreach (var gdDbService in _dbThreads.Values)
+                {
+                    gdDbService.RegisterServiceShutdown();
+                }
+            }
 
             var inc = 0;
-            while ((_guaranteedDeliveryThreadDelegate.IsRunning || _guaranteedDeliveryBackupThreadDelegate.IsRunning) && inc < 40)
+            while ((runningServiceCount > 0) && inc < 40)
             {
                 numMs += 250;
                 Thread.Sleep(250);
+                lock (_dbThreads)
+                {
+                    var shutdownServiceKeys = new List<string>();
+                    foreach (var gdDbService in _dbThreads)
+                    {
+                        if (!gdDbService.Value.IsRunning)
+                        {
+                            shutdownServiceKeys.Add(gdDbService.Key);
+                        }
+                    }
+                    foreach (string serviceKey in shutdownServiceKeys)
+                    {
+                        _dbThreads.Remove(serviceKey);
+                    }
+                    runningServiceCount = _dbThreads.Count;
+                }
                 inc++;
             }
 
             // Waited max of 10 seconds and it is still running
-            if (inc == 40 && (_guaranteedDeliveryThreadDelegate.IsRunning || _guaranteedDeliveryBackupThreadDelegate.IsRunning))
+            if (inc == 40 && runningServiceCount > 0)
             {
-                logger.PushError("Guaranteed Delivery Thread(s) did not shut down in 10 seconds.");
+                logger.PushError("Guaranteed Delivery Database Service(s) did not shut down in 10 seconds.");
                 logger.LogExecutionCompleteAsError(failedItemCount: 0);
             }
             else
             {
-                logger.PushInfo($"Guaranteed Delivery Thread(s) shut down in {numMs} milliseconds.");
+                logger.PushInfo($"Guaranteed Delivery Database Service(s) shut down in {numMs} milliseconds.");
                 logger.LogExecutionComplete(0);
             }
         }

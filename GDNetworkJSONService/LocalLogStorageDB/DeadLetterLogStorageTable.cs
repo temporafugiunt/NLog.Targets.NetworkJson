@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SQLite;
 using NLog.Targets.NetworkJSON.ExtensionMethods;
+using NLog.Targets.NetworkJSON.LocalLogStorageDB;
 
 namespace GDNetworkJSONService.LocalLogStorageDB
 {
@@ -12,6 +13,7 @@ namespace GDNetworkJSONService.LocalLogStorageDB
         public class Columns
         {
             public static ColumnInfo Endpoint { get; } = new ColumnInfo(nameof(Endpoint), "NVARCHAR(1024)", DbType.String, 1);
+            public static ColumnInfo EndpointType { get; } = new ColumnInfo(nameof(EndpointType), "NVARCHAR(20)", DbType.String, 2);
             public static ColumnInfo LogMessage { get; } = new ColumnInfo(nameof(LogMessage), "TEXT", DbType.String, 2);
             public static ColumnInfo CreatedOn { get; } = new ColumnInfo(nameof(CreatedOn), "DATETIME", DbType.DateTime, 3);
             public static ColumnInfo RetryCount { get; } = new ColumnInfo(nameof(RetryCount), "INT2", DbType.Int16, 4);
@@ -28,17 +30,21 @@ namespace GDNetworkJSONService.LocalLogStorageDB
 
         public static void CreateTable(SQLiteConnection dbConnection)
         {
-            var tableCreateSql = $"CREATE TABLE {TableName} ({Columns.Endpoint.ColumnName} {Columns.Endpoint.ColumnDDL}, {Columns.LogMessage.ColumnName} {Columns.LogMessage.ColumnDDL}, {Columns.CreatedOn.ColumnName} {Columns.CreatedOn.ColumnDDL}, {Columns.RetryCount.ColumnName} {Columns.RetryCount.ColumnDDL}, {Columns.ArchivedOn.ColumnName} {Columns.ArchivedOn.ColumnDDL})";
+            var tableCreateSql = $"CREATE TABLE {TableName} ({Columns.Endpoint.ColumnName} {Columns.Endpoint.ColumnDDL}, {Columns.EndpointType.ColumnName} {Columns.EndpointType.ColumnDDL}, {Columns.LogMessage.ColumnName} {Columns.LogMessage.ColumnDDL}, {Columns.CreatedOn.ColumnName} {Columns.CreatedOn.ColumnDDL}, {Columns.RetryCount.ColumnName} {Columns.RetryCount.ColumnDDL}, {Columns.ArchivedOn.ColumnName} {Columns.ArchivedOn.ColumnDDL})";
             var cmd = new SQLiteCommand(tableCreateSql, dbConnection);
             cmd.ExecuteNonQuery();
         }
 
-        public static int InsertLogRecord(SQLiteConnection dbConnection, string endpoint, string logMessage, DateTime createdOn, long retryCount)
+        public static int InsertLogRecord(SQLiteConnection dbConnection, string endpoint, string endpointType, string logMessage, DateTime createdOn, long retryCount)
         {
-            var dataInsertSql = $"INSERT INTO {TableName} ({Columns.Endpoint.ColumnName}, {Columns.LogMessage.ColumnName}, {Columns.CreatedOn.ColumnName}, {Columns.RetryCount.ColumnName}, {Columns.ArchivedOn.ColumnName}) VALUES ({Columns.Endpoint.ParameterName}, {Columns.LogMessage.ParameterName}, {Columns.CreatedOn.ParameterName}, {Columns.RetryCount.ParameterName}, {Columns.ArchivedOn.ParameterName})";
+            var dataInsertSql = $"INSERT INTO {TableName} ({Columns.Endpoint.ColumnName}, {Columns.EndpointType.ColumnName}, {Columns.LogMessage.ColumnName}, {Columns.CreatedOn.ColumnName}, {Columns.RetryCount.ColumnName}, {Columns.ArchivedOn.ColumnName}) VALUES ({Columns.Endpoint.ParameterName}, {Columns.EndpointType.ParameterName}, {Columns.LogMessage.ParameterName}, {Columns.CreatedOn.ParameterName}, {Columns.RetryCount.ParameterName}, {Columns.ArchivedOn.ParameterName})";
             var cmd = new SQLiteCommand(dataInsertSql, dbConnection);
 
             var param = Columns.Endpoint.GetParamterForColumn();
+            param.Value = endpoint;
+            cmd.Parameters.Add(param);
+
+            param = Columns.EndpointType.GetParamterForColumn();
             param.Value = endpoint;
             cmd.Parameters.Add(param);
 
