@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NLog.Targets.NetworkJSON.LocalLogStorageDB
+namespace NLog.Targets.NetworkJSON.GuaranteedDelivery.LocalLogStorageDB
 {
     public class LogStorageRecord
     {

@@ -133,7 +133,7 @@ namespace GDNetworkJSONService
         {
             lock (_dbThreads)
             {
-                var currentGdDbs = GdDbHelper.GetGdDbListFromDirectory(LogStorageDbGlobals.GbDbsPath);
+                var currentGdDbs = GdDbHelper.GetGdDbListFromDirectory(LogStorageDbGlobals.GdDbsPath);
                 foreach (var gdDb in currentGdDbs)
                 {
                     if (_dbThreads.ContainsKey(gdDb)) continue;

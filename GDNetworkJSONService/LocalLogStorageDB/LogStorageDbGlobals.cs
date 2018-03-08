@@ -8,7 +8,7 @@ namespace GDNetworkJSONService.LocalLogStorageDB
 
         public static int MinutesTillDeadLetter { get; set; }
 
-        public static string GbDbsPath { get; set; }
+        public static string GdDbsPath { get; set; }
 
         public static string GdDbConnectionStringTemplate { get; set; }
     }

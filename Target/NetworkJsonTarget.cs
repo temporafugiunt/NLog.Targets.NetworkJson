@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NLog.Config;
 using NLog.Layouts;
+using NLog.Targets.NetworkJSON.GuaranteedDelivery;
 
 namespace NLog.Targets.NetworkJSON
 {
     [Target("NetworkJSON")]
-    public class NetworkJsonTarget : TargetWithLayout
+    public class NetworkJsonTarget : TargetWithLayout, IGDEndpointWriter
     {
         private Lazy<IPEndPoint> _lazyIpEndoint;
         private Lazy<ITransport> _lazyITransport;

@@ -83,6 +83,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helper\BasicAuthHelper.cs" />
     <Compile Include="Loggers\LoggerFactory.cs" />
     <Compile Include="ActualLoggingLoadTester.cs">
       <SubType>Form</SubType>

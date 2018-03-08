@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Data.Entity.Core.Common.CommandTrees;
 using System.Data.SQLite;
 using System.Threading;
+using GDNetworkJSONService.Exceptions;
+using GDNetworkJSONService.GDEndpointWriters;
 using GDNetworkJSONService.LocalLogStorageDB;
 using NLog.Targets.NetworkJSON;
-using NLog.Targets.NetworkJSON.LocalLogStorageDB;
+using NLog.Targets.NetworkJSON.ExtensionMethods;
+using NLog.Targets.NetworkJSON.GuaranteedDelivery;
+using NLog.Targets.NetworkJSON.GuaranteedDelivery.LocalLogStorageDB;
 
 namespace GDNetworkJSONService.ServiceThreads
 {
@@ -19,7 +23,7 @@ namespace GDNetworkJSONService.ServiceThreads
         public static void ThreadMethod(GuaranteedDeliveryThreadDelegate threadData)
         {
             SQLiteConnection dbConnection = null;
-            var targets = new Dictionary<string, NetworkJsonTarget>();
+            var targets = new Dictionary<string, IGDEndpointWriter>();
             while (!threadData.IsAppShuttingDown)
             {
                 try
@@ -40,14 +44,28 @@ namespace GDNetworkJSONService.ServiceThreads
                         {
                             var messageId = (long)logMessages.Rows[inc][LogStorageTable.Columns.MessageId.Index];
                             var endpoint = logMessages.Rows[inc][LogStorageTable.Columns.Endpoint.Index].ToString();
-                            var endPointType = logMessages.Rows[inc][LogStorageTable.Columns.EndpointType.Index].ToString();
+                            var endpointType = logMessages.Rows[inc][LogStorageTable.Columns.EndpointType.Index].ToString();
+                            var endpointExtraInfo = logMessages.Rows[inc][LogStorageTable.Columns.EndpointExtraInfo.Index].ToString();
                             var logMessage = logMessages.Rows[inc][LogStorageTable.Columns.LogMessage.Index].ToString();
                             var retryCount = (long)logMessages.Rows[inc][LogStorageTable.Columns.RetryCount.Index];
                             var createdOn = (DateTime) logMessages.Rows[inc][LogStorageTable.Columns.CreatedOn.Index];
-                            NetworkJsonTarget currentTarget = null;
+
+                            IGDEndpointWriter currentTarget = null;
                             if (!targets.TryGetValue(endpoint, out currentTarget))
                             {
-                                currentTarget = new NetworkJsonTarget {Endpoint = endpoint};
+                                if (endpointType.CompareNoCase(GDServiceTarget.GDServiceTypes.socket))
+                                {
+                                    currentTarget = new NetworkJsonTarget { Endpoint = endpoint };
+                                }
+                                else if (endpointType.CompareNoCase(GDServiceTarget.GDServiceTypes.elastic))
+                                {
+                                    currentTarget = new ElasticEndpointWriter(endpoint, endpointExtraInfo);
+                                }
+                                else
+                                {
+                                    throw new DeadLetterException(
+                                        (int)DeadLetterLogStorageTable.ArchiveReasonId.UnsupportedEndpointType);
+                                }
                                 targets.Add(endpoint, currentTarget);
                             }
                             try
@@ -57,12 +75,17 @@ namespace GDNetworkJSONService.ServiceThreads
                                 LogStorageTable.DeleteProcessedRecord(dbConnection, messageId);
                                 Interlocked.Increment(ref TotalSuccessCount);
                             }
-                            catch (Exception ex)
+                            catch (DeadLetterException dlex)
+                            {
+                                DeadLetterLogStorageTable.InsertLogRecord(dbConnection, endpoint, endpointType, endpointExtraInfo, logMessage, createdOn, 0, dlex.ArchiveReasonId);
+                                LogStorageTable.DeleteProcessedRecord(dbConnection, messageId);
+                            }
+                            catch
                             {
                                 var recordAge = DateTime.Now - createdOn;
                                 if (recordAge.Minutes > LogStorageDbGlobals.MinutesTillDeadLetter)
                                 {
-                                    DeadLetterLogStorageTable.InsertLogRecord(dbConnection, endpoint, endPointType, logMessage, createdOn, retryCount);
+                                    DeadLetterLogStorageTable.InsertLogRecord(dbConnection, endpoint, endpointType, endpointExtraInfo, logMessage, createdOn, retryCount, (int)DeadLetterLogStorageTable.ArchiveReasonId.MessageExpiration);
                                     LogStorageTable.DeleteProcessedRecord(dbConnection, messageId);
                                 }
                                 else
@@ -76,7 +99,7 @@ namespace GDNetworkJSONService.ServiceThreads
                         }
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
                     dbConnection?.Close();
                     dbConnection = null;

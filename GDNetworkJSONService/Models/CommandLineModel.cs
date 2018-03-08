@@ -26,14 +26,12 @@ namespace GDNetworkJSONService.Models
                         @"and provides the 'store and forward' capability of the NLog.Targets.NetworkJSON",
                         @"NLog Target.",
                         @" ",
-                        $"{AppBinaryName} /CONSOLE [/ENDPOINT=http://localhost:portnumber] [/DBSELECTCOUNT=X]",
+                        $"{AppBinaryName} /CONSOLE /GDDBSPATH='C:\\somewhere' [/DBSELECTCOUNT=X]",
                         $"     [/MTDL=X]",
                         @" ",
                         @"  /CONSOLE                  Run this app in console mode, if this is NOT SET then",
                         @"                            the application will attempt to start as a service.",
-                        @"  /ENDPOINT                 The optional endpoint to use as the listener for client",
-                        @"                            programs. If not set then the default is retrieved from",
-                        @"                            the application configuration file.",
+                        @"  /GDDBSPATH                The location where Guaranteed Delivery DBs will reside.",
                         @"  /DBSELECTCOUNT            The number of log messages to read from the Log Storage DB",
                         $"                            in a single SELECT statement.",
                         @"  /MTDL                     The number of minutes on SUBSEQUENT retries of attempting to",
@@ -78,18 +76,10 @@ namespace GDNetworkJSONService.Models
                     ProcessOptionalCommandLineEntry(arg);
                 }
             }
-            if (Endpoint.IsNullOrEmpty())
+            if (GdDbsPath.IsNullOrEmpty())
             {
-                Endpoint = ConfigurationManager.AppSettings["Endpoint"];
-                if (Endpoint.IsNullOrEmpty())
-                {
-                    ErrorInfo.Add("Endpoint is not properly setup in the application configuration and was not passed at the command line.");
-                }
-            }
-            if (GbDbsPath.IsNullOrEmpty())
-            {
-                GbDbsPath = ConfigurationManager.AppSettings["GdDbsPath"];
-                if (GbDbsPath.IsNullOrEmpty())
+                GdDbsPath = ConfigurationManager.AppSettings["GdDbsPath"];
+                if (GdDbsPath.IsNullOrEmpty())
                 {
                     ErrorInfo.Add("Guaranteed Delivery DBs Path is not properly setup in the application configuration and was not passed at the command line.");
                 }
@@ -113,14 +103,6 @@ namespace GDNetworkJSONService.Models
 
         private void ProcessOptionalCommandLineEntry(string commandLineEntry)
         {
-            if (commandLineEntry.StartsWithCommandLineArg("endpoint"))
-            {
-                var arg = commandLineEntry.Split('=');
-                if (arg.Length == 2)
-                {
-                    Endpoint = arg[1];
-                }
-            }
             if (commandLineEntry.StartsWithCommandLineArg("dbselectcount"))
             {
                 var arg = commandLineEntry.Split('=');
@@ -149,6 +131,11 @@ namespace GDNetworkJSONService.Models
                     ErrorInfo.Add("Invalid MTDL parameter");
                 }
             }
+            if (commandLineEntry.StartsWithCommandLineArg("gddbspath"))
+            {
+                var arg = commandLineEntry.Split('=');
+                GdDbsPath = arg[1];
+            }
         }
 
         public void SetForServiceRun()
@@ -171,40 +158,34 @@ namespace GDNetworkJSONService.Models
                 ParameterInfo.Add($"Console Mode = {_consoleMode}");
             }
         }
-
-        private string _endpoint;
-        public string Endpoint
+        
+        public string GdDbsPath
         {
             get
             {
-                return _endpoint;
-            }
-            set
-            {
-                _endpoint = value;
-                ParameterInfo.Add($"Service Endpoint = {_endpoint}");
-            }
-        }
-
-        public string GbDbsPath
-        {
-            get
-            {
-                return LogStorageDbGlobals.GbDbsPath;
+                return LogStorageDbGlobals.GdDbsPath;
             }
             set
             {
                 if (value.IsNullOrEmpty())
                 {
-                    LogStorageDbGlobals.GbDbsPath = "";
+                    LogStorageDbGlobals.GdDbsPath = "";
                     return;
                 }
                 
                 try
                 {
+                    if (value.Length > 3 && (value.StartsWith("\"") || value.StartsWith("'")))
+                    {
+                        LogStorageDbGlobals.GdDbsPath = value.Substring(0, value.Length - 2);
+                    }
+                    else
+                    {
+                        LogStorageDbGlobals.GdDbsPath = value;
+                    }
+
                     if (!Directory.Exists(value)) Directory.CreateDirectory(value);
-                    LogStorageDbGlobals.GbDbsPath = value;
-                    ParameterInfo.Add($"Guaranteed Delivery DBs Path = {LogStorageDbGlobals.GbDbsPath}");
+                    ParameterInfo.Add($"Guaranteed Delivery DBs Path = {LogStorageDbGlobals.GdDbsPath}");
                 }
                 catch
                 {

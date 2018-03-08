@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Data.SQLite;
 
-namespace NLog.Targets.NetworkJSON.LocalLogStorageDB
+namespace NLog.Targets.NetworkJSON.GuaranteedDelivery.LocalLogStorageDB
 {
     public class ColumnInfo
     {

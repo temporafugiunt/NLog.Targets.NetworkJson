@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Threading;
+using GDNetworkJSONService.Exceptions;
+using GDNetworkJSONService.GDEndpointWriters;
 using GDNetworkJSONService.LocalLogStorageDB;
 using NLog.Targets.NetworkJSON;
-using NLog.Targets.NetworkJSON.LocalLogStorageDB;
+using NLog.Targets.NetworkJSON.ExtensionMethods;
+using NLog.Targets.NetworkJSON.GuaranteedDelivery;
+using NLog.Targets.NetworkJSON.GuaranteedDelivery.LocalLogStorageDB;
 
 namespace GDNetworkJSONService.ServiceThreads
 {
@@ -44,7 +48,7 @@ namespace GDNetworkJSONService.ServiceThreads
         public static void ThreadMethod(GuaranteedDeliveryThreadDelegate threadData)
         {
             SQLiteConnection dbConnection = null;
-            var targets = new Dictionary<string, NetworkJsonTarget>();
+            var targets = new Dictionary<string, IGDEndpointWriter>();
             while (!threadData.IsAppShuttingDown)
             {
                 try
@@ -66,20 +70,40 @@ namespace GDNetworkJSONService.ServiceThreads
                             var messageId = (long)logMessages.Rows[inc][LogStorageTable.Columns.MessageId.Index];
                             var endpoint = logMessages.Rows[inc][LogStorageTable.Columns.Endpoint.Index].ToString();
                             var endpointType = logMessages.Rows[inc][LogStorageTable.Columns.EndpointType.Index].ToString();
+                            var endpointExtraInfo = logMessages.Rows[inc][LogStorageTable.Columns.EndpointExtraInfo.Index].ToString();
                             var logMessage = logMessages.Rows[inc][LogStorageTable.Columns.LogMessage.Index].ToString();
-                            NetworkJsonTarget currentTarget = null;
-                            if (!targets.TryGetValue(endpoint, out currentTarget))
-                            {
-                                currentTarget = new NetworkJsonTarget {Endpoint = endpoint};
-                                targets.Add(endpoint, currentTarget);
-                            }
+                            var createdOn = (DateTime)logMessages.Rows[inc][LogStorageTable.Columns.CreatedOn.Index];
+
                             try
                             {
+                                IGDEndpointWriter currentTarget;
+                                if (!targets.TryGetValue(endpoint, out currentTarget))
+                                {
+                                    if (endpointType.CompareNoCase(GDServiceTarget.GDServiceTypes.socket))
+                                    {
+                                        currentTarget = new NetworkJsonTarget {Endpoint = endpoint};
+                                    }
+                                    else if (endpointType.CompareNoCase(GDServiceTarget.GDServiceTypes.elastic))
+                                    {
+                                        currentTarget = new ElasticEndpointWriter(endpoint, endpointExtraInfo);
+                                    }
+                                    else
+                                    {
+                                        throw new DeadLetterException(
+                                            (int) DeadLetterLogStorageTable.ArchiveReasonId.UnsupportedEndpointType);
+                                    }
+                                    targets.Add(endpoint, currentTarget);
+                                }
                                 currentTarget.Write(logMessage);
                                 LogStorageTable.DeleteProcessedRecord(dbConnection, messageId);
                                 Interlocked.Increment(ref TotalSuccessCount);
                             }
-                            catch (Exception ex)
+                            catch (DeadLetterException dlex)
+                            {
+                                DeadLetterLogStorageTable.InsertLogRecord(dbConnection, endpoint, endpointType, endpointExtraInfo, logMessage, createdOn, 0, dlex.ArchiveReasonId);
+                                LogStorageTable.DeleteProcessedRecord(dbConnection, messageId);
+                            }
+                            catch
                             {
                                 // Fail the message, backup thread will take over for this message until dead letter time.
                                 LogStorageTable.UpdateLogRecord(dbConnection, messageId, 1);
@@ -90,7 +114,7 @@ namespace GDNetworkJSONService.ServiceThreads
                         }
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
                     dbConnection?.Close();
                     dbConnection = null;

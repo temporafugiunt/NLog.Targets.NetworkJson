@@ -165,7 +165,7 @@ namespace NLog.Targets.NetworkJSON.LoadTester
             var loadTestThreadDatas = SetupLoadTestThreadList(numThreads, numTimesPerThread);
 
             // This query when executed will return a collection of tasks.
-            var loadTestThreadsQuery = from loadTestThreadData in loadTestThreadDatas select LoadTestManager.RunThreadLoadTestsSimulateLoggingAsync(txtGuaranteedDeliveryDbName.Text, txtNetworkJsonEndpoint.Text, "logstash", loadTestThreadData, ct);
+            var loadTestThreadsQuery = from loadTestThreadData in loadTestThreadDatas select LoadTestManager.RunThreadLoadTestsSimulateLoggingAsync(txtGuaranteedDeliveryDbName.Text, txtNetworkJsonEndpoint.Text, "elastic", loadTestThreadData, ct);
 
             LogActivity("Loading new threads.");
             // ToList executes the query and start the tasks. 

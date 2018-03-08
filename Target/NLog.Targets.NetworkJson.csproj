@@ -77,13 +77,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExtensionMethods\StringExtensions.cs" />
+    <Compile Include="GuaranteedDelivery\IGDEndpointWriter.cs" />
+    <Compile Include="Helper\BasicAuthHelper.cs" />
     <Compile Include="JsonConverter.cs" />
     <Compile Include="BaseJsonMessage.cs" />
-    <Compile Include="GDServiceTarget.cs" />
-    <Compile Include="LocalLogStorageDB\ColumnInfo.cs" />
-    <Compile Include="LocalLogStorageDB\LogStorageConnection.cs" />
-    <Compile Include="LocalLogStorageDB\LogStorageRecord.cs" />
-    <Compile Include="LocalLogStorageDB\LogStorageTable.cs" />
+    <Compile Include="GuaranteedDelivery\GDServiceTarget.cs" />
+    <Compile Include="GuaranteedDelivery\LocalLogStorageDB\ColumnInfo.cs" />
+    <Compile Include="GuaranteedDelivery\LocalLogStorageDB\LogStorageConnection.cs" />
+    <Compile Include="GuaranteedDelivery\LocalLogStorageDB\LogStorageRecord.cs" />
+    <Compile Include="GuaranteedDelivery\LocalLogStorageDB\LogStorageTable.cs" />
     <Compile Include="ParameterInfo.cs" />
     <Compile Include="IConverter.cs" />
     <Compile Include="IDnsResolver.cs" />
@@ -100,6 +102,7 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

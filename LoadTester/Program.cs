@@ -13,8 +13,8 @@ namespace NLog.Targets.NetworkJSON.LoadTester
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new SimulatedLoggingLoadTeser());
-            //Application.Run(new ActualLoggingLoadTeser());
+            //Application.Run(new SimulatedLoggingLoadTeser());
+            Application.Run(new ActualLoggingLoadTeser());
         }
     }
 }

@@ -84,6 +84,10 @@
     <Reference Include="PV.Logging">
       <HintPath>..\_lib\PV.Logging.dll</HintPath>
     </Reference>
+    <Reference Include="RestSharp, Version=106.1.0.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.106.1.0\lib\net452\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -105,17 +109,28 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Cors, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Cors.5.2.4\lib\net45\System.Web.Cors.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="tiv.elasticClient, Version=1.0.13.221, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\tiv.elasticClient.1.0.13.221\lib\net461\tiv.elasticClient.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Diagnostics\DBStatistics.cs" />
     <Compile Include="Diagnostics\ServiceStatistics.cs" />
+    <Compile Include="Exceptions\DeadLetterException.cs" />
     <Compile Include="ExtensionMethods\ServiceExtensions.cs" />
+    <Compile Include="GDEndpointWriters\ElasticEndpointWriter.cs" />
     <Compile Include="Helpers\AppSettingsHelper.cs" />
     <Compile Include="LocalLogStorageDB\DeadLetterLogStorageTable.cs" />
     <Compile Include="LocalLogStorageDB\GdDbHelper.cs" />
@@ -186,6 +201,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LoadTester\NLog.Targets.NetworkJSON.LoadTester.csproj">
+      <Project>{FAC7E618-5DEC-4ED5-A769-53A429642D45}</Project>
+      <Name>NLog.Targets.NetworkJSON.LoadTester</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Target\NLog.Targets.NetworkJSON.csproj">
       <Project>{8a614770-aec9-42ad-87ba-ccd53f880a55}</Project>
       <Name>NLog.Targets.NetworkJSON</Name>

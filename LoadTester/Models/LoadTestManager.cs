@@ -4,6 +4,8 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using NLog.Targets.NetworkJSON.GuaranteedDelivery;
+using NLog.Targets.NetworkJSON.LoadTester.Helper;
 using NLog.Targets.NetworkJSON.LoadTester.Loggers;
 
 namespace NLog.Targets.NetworkJSON.LoadTester.Models
@@ -19,8 +21,9 @@ namespace NLog.Targets.NetworkJSON.LoadTester.Models
             using (var target = new GDServiceTarget
                 {
                     GuaranteedDeliveryDB = gdDbPath,
-                    NetworkJsonEndpoint = networkJsonEndpoint,
-                    NetworkJsonType = networkJsonEndpointType
+                    Endpoint = networkJsonEndpoint,
+                    EndpointType = networkJsonEndpointType,
+                    EndpointExtraInfo = "pv-testapp-loadtest-{0:yyyy.MM.dd}|pv-testapp-loadtest|" + BasicAuthHelper.EncodeToBase64("logstash_writer", "logstash1412$#%*")
                 })
             {
                 Debug.Print("New GDServiceTarget Created.");
