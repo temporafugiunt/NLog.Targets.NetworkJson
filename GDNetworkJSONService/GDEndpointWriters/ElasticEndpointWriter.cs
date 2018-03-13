@@ -18,7 +18,9 @@ namespace GDNetworkJSONService.GDEndpointWriters
         private string _index;
         private string _docType;
         private IRestClient _elasticClient;
-        
+
+        public bool AllowMultiWrite => true;
+
         public ElasticEndpointWriter(string endpoint, string endpointExtraInfo)
         {
             if (endpointExtraInfo.IsNullOrEmpty())
@@ -52,13 +54,36 @@ namespace GDNetworkJSONService.GDEndpointWriters
             // Bulk of one at the moment... Yes, I know...
             var bulkApi = new BulkAPI();
             var bulkRequestBuilder = new StringBuilder();
-            string index = _index;
+            var index = _index;
+            // Index contains a date string that should be translated.
             if(_index.Contains("{"))
             {
                 index = string.Format(_index, DateTime.Now);
             }
             
-            bulkRequestBuilder.AddHitToBulkOperation(IndexDocumentActionType.Index, logEventAsJsonString, index, _docType);
+            bulkRequestBuilder.AddHitToBulkOperation(IndexDocumentActionType.Index, logEventAsJsonString.Replace(Environment.NewLine, ""), index, _docType);
+            var bulkRequestBody = bulkRequestBuilder.ToString();
+            string dummy;
+            bulkApi.Post(_elasticClient, bulkRequestBody, out dummy);
+        }
+
+        public void Write(string[] logEventsAsJsonStrings)
+        {
+            // Bulk of one at the moment... Yes, I know...
+            var bulkApi = new BulkAPI();
+            var bulkRequestBuilder = new StringBuilder();
+            var index = _index;
+            // Index contains a date string that should be translated.
+            if (_index.Contains("{"))
+            {
+                index = string.Format(_index, DateTime.Now);
+            }
+
+            foreach (var logEventAsJsonString in logEventsAsJsonStrings)
+            {
+                bulkRequestBuilder.AddHitToBulkOperation(IndexDocumentActionType.Index, logEventAsJsonString.Replace(Environment.NewLine, ""), index, _docType);
+            }
+            
             var bulkRequestBody = bulkRequestBuilder.ToString();
             string dummy;
             bulkApi.Post(_elasticClient, bulkRequestBody, out dummy);

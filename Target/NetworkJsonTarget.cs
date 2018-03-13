@@ -19,16 +19,18 @@ namespace NLog.Targets.NetworkJSON
         private Lazy<ITransport> _lazyITransport;
         private Uri _endpoint;
 
+        public bool AllowMultiWrite => false;
+
         #region Task Properties
 
         [Required]
         public string Endpoint
         {
             get { return _endpoint.ToString(); }
-            set {  _endpoint = value != null ? new Uri(Environment.ExpandEnvironmentVariables(value)) : null; }
+            set { _endpoint = value != null ? new Uri(Environment.ExpandEnvironmentVariables(value)) : null; }
         }
-        
-        [ArrayParameter(typeof(ParameterInfo), "parameter")]
+
+        [ArrayParameter(typeof (ParameterInfo), "parameter")]
         public IList<ParameterInfo> Parameters { get; private set; }
 
         public bool OnFailStoreAndForward { get; set; }
@@ -39,9 +41,15 @@ namespace NLog.Targets.NetworkJSON
         private IEnumerable<ITransport> Transports { get; set; }
         private DnsBase Dns { get; set; }
 
-        public NetworkJsonTarget() : this(new List<ITransport>() { new UdpTransport(new UdpTransportClient()), new TcpTransport(new TcpTransportClient()) }, 
-            new JsonConverter(), 
-            new DnsWrapper())
+        public NetworkJsonTarget()
+            : this(
+                new List<ITransport>()
+                {
+                    new UdpTransport(new UdpTransportClient()),
+                    new TcpTransport(new TcpTransportClient())
+                },
+                new JsonConverter(),
+                new DnsWrapper())
         {
         }
 
@@ -80,7 +88,7 @@ namespace NLog.Targets.NetworkJSON
                     logEvent.Properties.Add(par.Name, stringValue);
                 }
             }
-            
+
             var jsonObject = Converter.GetLogEventJson(logEvent);
             if (jsonObject == null) return;
             var logEventAsJsonString = jsonObject.ToString(Formatting.None, null);
@@ -93,6 +101,11 @@ namespace NLog.Targets.NetworkJSON
         public void Write(string logEventAsJsonString)
         {
             _lazyITransport.Value.Send(_lazyIpEndoint.Value, logEventAsJsonString);
+        }
+
+        public void Write(string[] logEventsAsJsonStrings)
+        {
+            throw new NotImplementedException($"{nameof(AllowMultiWrite)} is false for {nameof(NetworkJsonTarget)}");
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data;
 using System.Data.SQLite;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using NLog.Targets.NetworkJSON.ExtensionMethods;
 
@@ -104,11 +106,32 @@ namespace NLog.Targets.NetworkJSON.GuaranteedDelivery.LocalLogStorageDB
             return dt;
         }
 
-        public static int UpdateLogRecord(SQLiteConnection dbConnection, long messageId, long retryCount)
+        public static DataTable GetFailedRecords(SQLiteConnection dbConnection, int selectCount, int expiredMinutes)
         {
-            var dataInsertSql = $"UPDATE {TableName} SET {Columns.RetryCount.ColumnName} = {retryCount} WHERE {Columns.MessageId.ColumnName} = {messageId}";
+            var dataSelectSql = $"SELECT * FROM {TableName} WHERE {Columns.RetryCount.ColumnName} > 2 AND Cast((JulianDay() - JulianDay({Columns.CreatedOn.ColumnName})) * 24 * 60 As Integer) > {expiredMinutes} LIMIT {selectCount}";
+            
+            var cmd = new SQLiteCommand(dataSelectSql, dbConnection);
+            var dt = new DataTable(TableName);
+            var reader = cmd.ExecuteReader();
+            dt.Load(reader);
+            return dt;
+        }
+
+        public static int UpdateLogRecordRetryCount(SQLiteConnection dbConnection, long messageId)
+        {
+            var dataInsertSql = $"UPDATE {TableName} SET {Columns.RetryCount.ColumnName} = {Columns.RetryCount.ColumnName} + 1 WHERE {Columns.MessageId.ColumnName} = {messageId}";
+            Debug.WriteLine(dataInsertSql);
             var cmd = new SQLiteCommand(dataInsertSql, dbConnection);
             
+            return cmd.ExecuteNonQuery();
+        }
+
+        public static int UpdateLogRecordsRetryCount(SQLiteConnection dbConnection, long[] messageIds)
+        {
+            var dataInsertSql = $"UPDATE {TableName} SET {Columns.RetryCount.ColumnName} = {Columns.RetryCount.ColumnName} + 1 WHERE {Columns.MessageId.ColumnName} in ({string.Join(",", messageIds)})";
+            Debug.WriteLine(dataInsertSql);
+            var cmd = new SQLiteCommand(dataInsertSql, dbConnection);
+
             return cmd.ExecuteNonQuery();
         }
 
@@ -119,6 +142,13 @@ namespace NLog.Targets.NetworkJSON.GuaranteedDelivery.LocalLogStorageDB
             return cmd.ExecuteNonQuery();
         }
 
+        public static int DeleteProcessedRecords(SQLiteConnection dbConnection, long[] messageIds)
+        {
+            var dataInsertSql = $"DELETE FROM {TableName} WHERE {Columns.MessageId.ColumnName} in ({string.Join(",", messageIds)})";
+            var cmd = new SQLiteCommand(dataInsertSql, dbConnection);
+            return cmd.ExecuteNonQuery();
+        }
+        
         public static long GetBacklogCount(SQLiteConnection dbConnection)
         {
             var dataSelectSql = $"SELECT COUNT(*) FROM {TableName}";

@@ -58,6 +58,16 @@ namespace GDNetworkJSONService.Helpers
             }
         }
 
+        public static int MultiWritePause
+        {
+            get
+            {
+                var multiWritePauseStr = ConfigurationManager.AppSettings["MultiWritePause"];
+                var multiWritePauseInt = 0;
+                return int.TryParse(multiWritePauseStr, out multiWritePauseInt) ? multiWritePauseInt : 0;
+            }
+        }
+
         public static int MinutesToDeadLetter
         {
             get

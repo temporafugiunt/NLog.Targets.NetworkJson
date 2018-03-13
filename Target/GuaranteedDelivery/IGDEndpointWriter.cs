@@ -11,6 +11,10 @@ namespace NLog.Targets.NetworkJSON.GuaranteedDelivery
     /// </summary>
     public interface IGDEndpointWriter
     {
+        bool AllowMultiWrite { get; }
+
         void Write(string logEventAsJsonString);
+
+        void Write(string[] logEventsAsJsonStrings);
     }
 }

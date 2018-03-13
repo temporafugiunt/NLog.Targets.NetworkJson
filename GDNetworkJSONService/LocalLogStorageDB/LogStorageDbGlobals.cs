@@ -6,6 +6,8 @@ namespace GDNetworkJSONService.LocalLogStorageDB
     {
         public static int DbSelectCount { get; set; }
 
+        public static int MultiWritePause { get; set; }
+
         public static int MinutesTillDeadLetter { get; set; }
 
         public static string GdDbsPath { get; set; }

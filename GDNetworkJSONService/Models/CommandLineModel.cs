@@ -27,13 +27,16 @@ namespace GDNetworkJSONService.Models
                         @"NLog Target.",
                         @" ",
                         $"{AppBinaryName} /CONSOLE /GDDBSPATH='C:\\somewhere' [/DBSELECTCOUNT=X]",
-                        $"     [/MTDL=X]",
+                        @"     [/MULTIWRITEPAUSE=X] [/MTDL=X]",
                         @" ",
                         @"  /CONSOLE                  Run this app in console mode, if this is NOT SET then",
                         @"                            the application will attempt to start as a service.",
                         @"  /GDDBSPATH                The location where Guaranteed Delivery DBs will reside.",
                         @"  /DBSELECTCOUNT            The number of log messages to read from the Log Storage DB",
-                        $"                            in a single SELECT statement.",
+                        @"                            in a single SELECT statement.",
+                        @"  /MULTIWRITEPAUSE          The number of milliseconds to wait before attempting to process",
+                        @"                            more messages with a multiwrite target if the logging database",
+                        @"                            does not return DBSELECTCOUNT messages.",
                         @"  /MTDL                     The number of minutes on SUBSEQUENT retries of attempting to",
                         @"                            send a log message before it is considered a 'Dead Letter'",
                         $"                            and is moved to the {DeadLetterLogStorageTable.TableName} table.",
@@ -88,6 +91,10 @@ namespace GDNetworkJSONService.Models
             {
                 DbSelectCount = AppSettingsHelper.DbSelectCount;
             }
+            if (MultiWritePause < 1)
+            {
+                MultiWritePause = AppSettingsHelper.MultiWritePause;
+            }
             if (MinutesToDeadLetter < 1)
             {
                 MinutesToDeadLetter = AppSettingsHelper.MinutesToDeadLetter;
@@ -117,7 +124,21 @@ namespace GDNetworkJSONService.Models
                     ErrorInfo.Add("Invalid DBSELECTCOUNT parameter");
                 }
             }
-            if (commandLineEntry.StartsWithCommandLineArg("mtdl"))
+            else if (commandLineEntry.StartsWithCommandLineArg("multiwritepause"))
+            {
+                var arg = commandLineEntry.Split('=');
+                var multiWritePause = -1;
+
+                if ((arg.Length == 2) && int.TryParse(arg[1], out multiWritePause) && multiWritePause > 0)
+                {
+                    MultiWritePause = multiWritePause;
+                }
+                else
+                {
+                    ErrorInfo.Add("Invalid MULTIWRITEPAUSE parameter");
+                }
+            }
+            else if (commandLineEntry.StartsWithCommandLineArg("mtdl"))
             {
                 var arg = commandLineEntry.Split('=');
                 var mtdl = -1;
@@ -131,7 +152,7 @@ namespace GDNetworkJSONService.Models
                     ErrorInfo.Add("Invalid MTDL parameter");
                 }
             }
-            if (commandLineEntry.StartsWithCommandLineArg("gddbspath"))
+            else if (commandLineEntry.StartsWithCommandLineArg("gddbspath"))
             {
                 var arg = commandLineEntry.Split('=');
                 GdDbsPath = arg[1];
@@ -193,7 +214,7 @@ namespace GDNetworkJSONService.Models
                 }
             }
         }
-        
+
         public int DbSelectCount
         {
             get
@@ -207,7 +228,24 @@ namespace GDNetworkJSONService.Models
                     return;
                 }
                 LogStorageDbGlobals.DbSelectCount = value;
-                ParameterInfo.Add($"DB Read Count = {LogStorageDbGlobals.DbSelectCount}");
+                ParameterInfo.Add($"DB Select Count = {LogStorageDbGlobals.DbSelectCount}");
+            }
+        }
+
+        public int MultiWritePause
+        {
+            get
+            {
+                return LogStorageDbGlobals.MultiWritePause;
+            }
+            set
+            {
+                if (value < 1)
+                {
+                    return;
+                }
+                LogStorageDbGlobals.MultiWritePause = value;
+                ParameterInfo.Add($"MultiWrite Pause (MS) = {LogStorageDbGlobals.MultiWritePause}");
             }
         }
 
