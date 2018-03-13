@@ -6,9 +6,7 @@
       throwExceptions="false"
       internalLogLevel="Off" internalLogFile="c:\temp\nlog-internal.log">
   <targets>
-    <target name="LogstashWithFallback">
-      <target name="TryLogStash" endpoint="tcp://s-loga.pvops.com:8889" />
-      <target name="FailToGDService"  networkJsonEndpoint="tcp://s-loga.pvops.com:8889" />
-    </target>
+    <target name="Elastic" Endpoint="https://s-loga.pvops.com:9200" />
+    <target name="LogStash" Endpoint="tcp://s-loga.pvops.com:8889" />
   </targets>
 </nlog>

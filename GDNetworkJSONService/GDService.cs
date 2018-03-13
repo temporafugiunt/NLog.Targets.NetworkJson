@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.ServiceProcess;
 using System.Threading;
 using GDNetworkJSONService;
@@ -9,6 +10,7 @@ using GDNetworkJSONService.LocalLogStorageDB;
 using GDNetworkJSONService.Loggers;
 using GDNetworkJSONService.Models;
 using GDNetworkJSONService.Services;
+using GDNetworkJSONService.ServiceThreads;
 using Microsoft.Owin;
 using NLog.Targets.NetworkJSON.ExtensionMethods;
 
@@ -145,44 +147,52 @@ namespace GDNetworkJSONService
             }
         }
 
-        
+         
 
         private void DiagnosticsCallback(object state)
         {
             if (!_isRunning) return;
-            // TODO: Needs rewrite.
-            //var diagnosticsLogger = LoggerFactory.GetDiagnosticsInstrumentationLogger();
-            //diagnosticsLogger.LogItemsReceived = Interlocked.Exchange(ref LoggingHub.TotalMessageCount, 0);
-            //diagnosticsLogger.LogItemsSentFirstTry = Interlocked.Exchange(ref GuaranteedDeliveryThread.TotalSuccessCount, 0);
-            //diagnosticsLogger.LogItemsFailedFirstTry = Interlocked.Exchange(ref GuaranteedDeliveryThread.TotalFailedCount, 0);
-            //diagnosticsLogger.LogItemsSentOnRetry = Interlocked.Exchange(ref GuaranteedDeliveryBackupThread.TotalSuccessCount, 0);
-            //diagnosticsLogger.LogItemsFailedOnRetry = Interlocked.Exchange(ref GuaranteedDeliveryBackupThread.TotalFailedCount, 0);
-            //diagnosticsLogger.DiagnosticsIntervalMS = _diagnosticsInterval;
-            //try
-            //{
-            //    using (var dbConnection = LogStorageDbGlobals.OpenNewConnection())
-            //    {
-            //        diagnosticsLogger.BacklogCount = LogStorageTable.GetBacklogCount(dbConnection);
-            //        diagnosticsLogger.DeadLetterCount = DeadLetterLogStorageTable.GetDeadLetterCount(dbConnection);
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //}
 
-            //if (AppSettingsHelper.SkipZeroDiagnostics)
-            //{
-            //    if (diagnosticsLogger.LogItemsReceived > 0 || diagnosticsLogger.LogItemsSentFirstTry > 0 ||
-            //        diagnosticsLogger.LogItemsFailedFirstTry > 0 || diagnosticsLogger.LogItemsSentOnRetry > 0 ||
-            //        diagnosticsLogger.LogItemsFailedOnRetry > 0 || diagnosticsLogger.BacklogCount > 0 || diagnosticsLogger.DeadLetterCount > 0)
-            //    {
-            //        diagnosticsLogger.LogFullDiagnostics();
-            //    }
-            //}
-            //else
-            //{
-            //    diagnosticsLogger.LogFullDiagnostics();
-            //}
+            var threadDiagnostics = new List<FullThreadDiagnosticInfo>();
+
+            lock (_dbThreads)
+            {
+                foreach (var gdDbService in _dbThreads.Values)
+                {
+                    // Don't publish metadata about your metadata... That is just too meta... data...
+                    if (gdDbService.DbFilePath.ToLower().Contains("gddiagnostics.sqlite")) continue;
+                    threadDiagnostics.Add(new FullThreadDiagnosticInfo(gdDbService.GetPrimaryThreadCounts(), gdDbService.GetBackupThreadCounts(), gdDbService.DbFilePath));
+                }
+            }
+
+            var diagnosticsLogger = LoggerFactory.GetDiagnosticsInstrumentationLogger();
+
+            // Send a diagnostic message per thread.
+            foreach (var threadDiagnostic in threadDiagnostics)
+            {
+                diagnosticsLogger.LoggingDB = threadDiagnostic.LoggingDb;
+                diagnosticsLogger.LogItemsSentFirstTry = threadDiagnostic.PrimaryThreadCounts.SuccessCount;
+                diagnosticsLogger.LogItemsFailedFirstTry = threadDiagnostic.PrimaryThreadCounts.FailedCount;
+                diagnosticsLogger.BacklogCount = threadDiagnostic.PrimaryThreadCounts.BacklogCount;
+                diagnosticsLogger.DeadLetterCount = threadDiagnostic.PrimaryThreadCounts.DeadLetterCount;
+                diagnosticsLogger.LogItemsSentOnRetry = threadDiagnostic.BackupThreadCounts.SuccessCount;
+                diagnosticsLogger.LogItemsFailedOnRetry = threadDiagnostic.BackupThreadCounts.FailedCount;
+                diagnosticsLogger.DiagnosticsIntervalMS = _diagnosticsInterval;
+
+                if (AppSettingsHelper.SkipZeroDiagnostics)
+                {
+                    if (diagnosticsLogger.LogItemsSentFirstTry > 0 ||diagnosticsLogger.LogItemsFailedFirstTry > 0 || 
+                        diagnosticsLogger.LogItemsSentOnRetry > 0 || diagnosticsLogger.LogItemsFailedOnRetry > 0 || 
+                        diagnosticsLogger.BacklogCount > 0 || diagnosticsLogger.DeadLetterCount > 0)
+                    {
+                        diagnosticsLogger.LogFullDiagnostics();
+                    }
+                }
+                else
+                {
+                    diagnosticsLogger.LogFullDiagnostics();
+                }
+            }
 
             MaintainGdDbList();
         }

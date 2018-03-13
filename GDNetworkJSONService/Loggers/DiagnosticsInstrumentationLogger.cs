@@ -14,8 +14,8 @@ namespace GDNetworkJSONService.Loggers
 
         #region Properties
 
+        public string LoggingDB { get; set; }
         public long DiagnosticsIntervalMS { get; set; }
-        public int LogItemsReceived { get; set; }
         public int LogItemsSentFirstTry { get; set; }
         public int LogItemsSentOnRetry { get; set; }
         public int LogItemsFailedFirstTry { get; set; }
@@ -33,7 +33,7 @@ namespace GDNetworkJSONService.Loggers
 
         public void LogFullDiagnostics()
         {
-            PushInfo(nameof(LogItemsReceived), LogItemsReceived.ToString());
+            PushInfo(nameof(LoggingDB), LoggingDB);
             PushInfo(nameof(LogItemsSentFirstTry), LogItemsSentFirstTry.ToString());
             PushInfo(nameof(LogItemsSentOnRetry), LogItemsSentOnRetry.ToString());
             PushInfo(nameof(LogItemsFailedFirstTry), LogItemsFailedFirstTry.ToString());
@@ -62,7 +62,7 @@ namespace GDNetworkJSONService.Loggers
 
         protected sealed override void SetCustomProperties(LogEventInfo logEvent)
         {
-            logEvent.Properties["logItemsReceived"] = LogItemsReceived;
+            logEvent.Properties["loggingDB"] = LoggingDB;
             logEvent.Properties["logItemsSentFirstTry"] = LogItemsSentFirstTry;
             logEvent.Properties["logItemsSentOnRetry"] = LogItemsSentOnRetry;
             logEvent.Properties["logItemsFailedFirstTry"] = LogItemsFailedFirstTry;

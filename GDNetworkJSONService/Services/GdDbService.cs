@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity.ModelConfiguration.Conventions;
-using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using GDNetworkJSONService.LocalLogStorageDB;
 using GDNetworkJSONService.Loggers;
 using GDNetworkJSONService.ServiceThreads;
-using Microsoft.Owin.Hosting;
 using NLog.Targets.NetworkJSON.GuaranteedDelivery.LocalLogStorageDB;
 
 namespace GDNetworkJSONService.Services
@@ -106,6 +100,16 @@ namespace GDNetworkJSONService.Services
             IsAppShuttingDown = true;
             _guaranteedDeliveryThreadDelegate?.RegisterThreadShutdown();
             _guaranteedDeliveryBackupThreadDelegate?.RegisterThreadShutdown();
+        }
+
+        public ThreadCounts GetPrimaryThreadCounts()
+        {
+            return _guaranteedDeliveryThreadDelegate == null ? new ThreadCounts() : _guaranteedDeliveryThreadDelegate.GetCounts();
+        }
+
+        public ThreadCounts GetBackupThreadCounts()
+        {
+            return _guaranteedDeliveryBackupThreadDelegate == null ? new ThreadCounts() : _guaranteedDeliveryBackupThreadDelegate.GetCounts();
         }
     }
 }

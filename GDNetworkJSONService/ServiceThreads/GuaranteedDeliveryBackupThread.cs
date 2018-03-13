@@ -68,8 +68,7 @@ namespace GDNetworkJSONService.ServiceThreads
                                     }
                                     else
                                     {
-                                        throw new DeadLetterException(
-                                            (int)DeadLetterLogStorageTable.ArchiveReasonId.UnsupportedEndpointType);
+                                        throw new DeadLetterException((int)DeadLetterLogStorageTable.ArchiveReasonId.UnsupportedEndpointType);
                                     }
                                     targets.Add($"{endpointType}_{endpoint}_{endpointExtraInfo}", currentTarget);
                                 }
@@ -87,11 +86,16 @@ namespace GDNetworkJSONService.ServiceThreads
                                         Debug.WriteLine($"GDBackground Thread Sending {logMessageStrings.Count} messages.");
                                         currentTarget.Write(logMessageStrings.ToArray());
                                         LogStorageTable.DeleteProcessedRecords(dbConnection, messageIds.ToArray());
+                                        threadData.IncSuccess(messageIds.Count);
                                     }
                                     catch (Exception)
                                     {
                                         if (messageIds.Count > 0)
+                                        {
                                             LogStorageTable.UpdateLogRecordsRetryCount(dbConnection, messageIds.ToArray());
+                                            threadData.IncFailed(messageIds.Count);
+                                        }
+                                            
                                         throw;
                                     }
                                 }
@@ -106,17 +110,17 @@ namespace GDNetworkJSONService.ServiceThreads
                                         {
                                             currentTarget.Write(logMessage);
                                             LogStorageTable.DeleteProcessedRecord(dbConnection, messageId);
-                                            Interlocked.Increment(ref TotalSuccessCount);
+                                            threadData.IncSuccess(1);
                                         }
                                         catch (Exception)
                                         {
                                             // Fail the message, backup thread will take over for this message until dead letter time.
                                             LogStorageTable.UpdateLogRecordRetryCount(dbConnection, messageId);
+                                            threadData.IncFailed(1);
                                             throw;
                                         }
                                     }
                                 }
-                                Interlocked.Increment(ref TotalSuccessCount);
                             }
                             // This entire group is unsupported, this should only happen with target and service version conflicts or during development.
                             catch (DeadLetterException dlex)
@@ -129,20 +133,21 @@ namespace GDNetworkJSONService.ServiceThreads
 
                                     DeadLetterLogStorageTable.InsertLogRecord(dbConnection, endpoint, endpointType, endpointExtraInfo, logMessage, createdOn, 0, dlex.ArchiveReasonId);
                                     LogStorageTable.DeleteProcessedRecord(dbConnection, messageId);
+                                    threadData.IncFailed(1);
                                 }
 
                             }
                             catch
                             {
                                 targets.Remove(endpoint);
-                                Interlocked.Increment(ref TotalFailedCount);
                                 Thread.Sleep(500);
                             }
                         }
 
-                        // Find and move any dead letters
-                        if (LogStorageDbGlobals.MinutesTillDeadLetter > 0)
+                        try
                         {
+                            // Find and move any dead letters
+                            if (LogStorageDbGlobals.MinutesTillDeadLetter <= 0) continue;
                             var failedLogMessages = LogStorageTable.GetFailedRecords(dbConnection, LogStorageDbGlobals.DbSelectCount, LogStorageDbGlobals.MinutesTillDeadLetter);
                             for (var inc = 0; inc < failedLogMessages.Rows.Count; inc++)
                             {
@@ -158,6 +163,7 @@ namespace GDNetworkJSONService.ServiceThreads
                                 LogStorageTable.DeleteProcessedRecord(dbConnection, messageId);
                             }
                         }
+                        catch {}
                     }
                 }
                 catch
